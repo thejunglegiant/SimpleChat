@@ -1,11 +1,5 @@
 package com.oleksii.simplechat.utils;
 
-import android.util.Log;
-
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 public enum CountriesCodes {
 
     AFGHANISTAN ("Afghanistan", "93", "AF"),
@@ -272,7 +266,6 @@ public enum CountriesCodes {
         int counter = 0;
         for (CountriesCodes item : CountriesCodes.values()) {
             if (str.equals(item.NMCode)) {
-                Log.i("EnterPhone", str);
                 return counter;
             }
             counter++;
