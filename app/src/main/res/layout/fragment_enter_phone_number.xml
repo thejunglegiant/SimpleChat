@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/colorWhite"
+    tools:context=".authentication.EnterPhoneNumberFragment">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:navigationIcon="?attr/homeAsUpIndicator"
+            app:popupTheme="@style/AppTheme.PopupOverlay" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <Spinner
+        android:id="@+id/countries_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/big_margin"
+        android:layout_marginHorizontal="@dimen/big_margin"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/appBarLayout" />
+
+    <EditText
+        style="@style/textStandard"
+        android:id="@+id/country_code_text"
+        android:layout_width="75dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/standard"
+        android:paddingHorizontal="10dp"
+        android:inputType="phone"
+        android:importantForAutofill="no"
+        android:text="+"
+        android:digits="0123456789+"
+        android:maxLength="5"
+        android:singleLine="true"
+        android:imeOptions="actionDone"
+        app:layout_constraintStart_toStartOf="@+id/countries_list"
+        app:layout_constraintTop_toBottomOf="@+id/countries_list"
+        tools:ignore="HardcodedText" />
+
+    <com.oleksii.simplechat.utils.PhoneNumberEditText
+        style="@style/textStandard"
+        android:id="@+id/phone_number_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/standard"
+        android:importantForAutofill="no"
+        android:paddingHorizontal="10dp"
+        android:layout_marginLeft="@dimen/standard"
+        android:singleLine="true"
+        android:imeOptions="actionDone"
+        app:layout_constraintEnd_toEndOf="@+id/countries_list"
+        app:layout_constraintStart_toEndOf="@+id/country_code_text"
+        app:layout_constraintTop_toBottomOf="@+id/countries_list"
+        tools:ignore="HardcodedText,RtlHardcoded" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/standard"
+        android:text="@string/please_confirm_your_country_code_and_enter_your_phone_number"
+        app:layout_constraintEnd_toEndOf="@+id/countries_list"
+        app:layout_constraintStart_toStartOf="@+id/countries_list"
+        app:layout_constraintTop_toBottomOf="@+id/country_code_text" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/standard"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@drawable/ic_arrow_forward" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

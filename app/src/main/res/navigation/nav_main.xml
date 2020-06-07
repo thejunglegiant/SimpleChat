@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_main"
+    app:startDestination="@id/chatsListFragment">
+
+    <fragment
+        android:id="@+id/chatsListFragment"
+        android:name="com.oleksii.simplechat.mainflow.ChatsListFragment"
+        android:label="fragment_chats_list"
+        tools:layout="@layout/fragment_chats_list" >
+        <action
+            android:id="@+id/action_chatsListFragment_to_inviteFriendsFragment"
+            app:destination="@id/inviteFriendsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/inviteFriendsFragment"
+        android:name="com.oleksii.simplechat.otherscreens.InviteFriendsFragment"
+        android:label="fragment_invite_friends"
+        tools:layout="@layout/fragment_invite_friends" />
+</navigation>
