@@ -2,12 +2,17 @@ package com.oleksii.simplechat.authentication;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
+
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,50 +27,54 @@ import com.oleksii.simplechat.utils.PhoneNumberEditText;
 
 import java.util.concurrent.TimeUnit;
 
-public class VerifyPhoneNumberActivity extends AppCompatActivity {
+public class VerifyPhoneNumberFragment extends Fragment {
 
     private String verificationId;
     private FirebaseAuth auth;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_verify_phone_number);
+        View rootview = inflater.inflate(R.layout.fragment_verify_phone_number, container, false);
 
         auth = FirebaseAuth.getInstance();
         auth.useAppLanguage();
-        String countryCode = getIntent().getStringExtra("countryCode");
-        String phoneNumber = getIntent().getStringExtra("phoneNumber");
+        String countryCode = getArguments().getString("countryCode");
+        String phoneNumber = getArguments().getString("phoneNumber");
         sendVerificationCode(countryCode + phoneNumber);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        Toolbar toolbar = rootview.findViewById(R.id.toolbar);
         toolbar.setTitle(countryCode + " " + PhoneNumberEditText.formatPhoneNumber(phoneNumber));
         toolbar.setNavigationOnClickListener(v -> {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             builder.setTitle(R.string.simple_chat);
             builder.setMessage(R.string.stop_verification_process)
                     .setPositiveButton(R.string._continue, (DialogInterface.OnClickListener) (dialog, id) -> {
                         // Just continue
                     })
                     .setNegativeButton(R.string.stop, (DialogInterface.OnClickListener) (dialog, id) -> {
-                        onBackPressed();
-                        this.finish();
+                        Navigation.findNavController(v).navigate(
+                                R.id.action_verifyPhoneNumberFragment_to_enterPhoneNumberFragment
+                        );
                     });
             builder.show();
         });
 
-        EditText codeVerification = findViewById(R.id.code_text);
+        EditText codeVerification = rootview.findViewById(R.id.code_text);
         codeVerification.setOnEditorActionListener((TextView.OnEditorActionListener) (v, actionId, event) -> {
             String code = codeVerification.getText().toString().trim();
             verifyCode(code);
             return true;
         });
 
-        TextView contactUs = findViewById(R.id.contact_us);
+        TextView contactUs = rootview.findViewById(R.id.contact_us);
         contactUs.setOnClickListener(v -> {
             Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/thejunglegiant"));
             startActivity(browserIntent);
         });
+
+        return rootview;
     }
 
     private void verifyCode(String code) {
@@ -77,11 +86,11 @@ public class VerifyPhoneNumberActivity extends AppCompatActivity {
         auth.signInWithCredential(credential)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        Intent intent = new Intent(VerifyPhoneNumberActivity.this, MainActivity.class);
+                        Intent intent = new Intent(getActivity(), MainActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(intent);
                     } else {
-                        Toast.makeText(VerifyPhoneNumberActivity.this,
+                        Toast.makeText(getContext(),
                                 task.getException().getMessage(), Toast.LENGTH_LONG).show();
                     }
                 });
@@ -89,11 +98,11 @@ public class VerifyPhoneNumberActivity extends AppCompatActivity {
 
     private void sendVerificationCode(String phoneNumber) {
         PhoneAuthProvider.getInstance().verifyPhoneNumber(
-                phoneNumber,        // Phone number to verify
-                60,                 // Timeout duration
-                TimeUnit.SECONDS,   // Unit of timeout
-                this,               // Activity (for callback binding)
-                mCallbacks);        // OnVerificationStateChangedCallbacks
+                phoneNumber,
+                60,
+                TimeUnit.SECONDS,
+                getActivity(),
+                mCallbacks);
     }
 
     private PhoneAuthProvider.OnVerificationStateChangedCallbacks
@@ -115,7 +124,7 @@ public class VerifyPhoneNumberActivity extends AppCompatActivity {
 
         @Override
         public void onVerificationFailed(@NonNull FirebaseException e) {
-            Toast.makeText(VerifyPhoneNumberActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_LONG).show();
         }
     };
 }

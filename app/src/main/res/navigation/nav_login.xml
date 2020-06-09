@@ -35,7 +35,8 @@
         android:id="@+id/enterPhoneNumberFragment"
         android:name="com.oleksii.simplechat.authentication.EnterPhoneNumberFragment"
         android:label="fragment_enter_phone_number"
-        tools:layout="@layout/fragment_enter_phone_number" >
+        tools:layout="@layout/fragment_enter_phone_number"
+        app:startDestination="@id/action_enterPhoneNumberFragment_to_verifyPhoneNumberFragment">
         <action
             android:id="@+id/action_enterPhoneNumberFragment_to_loginFragment"
             app:destination="@id/loginFragment"
@@ -43,5 +44,31 @@
             app:exitAnim="@anim/exit_to_right"
             app:popEnterAnim="@anim/enter_from_right"
             app:popExitAnim="@anim/exit_to_left" />
+        <action
+            android:id="@+id/action_enterPhoneNumberFragment_to_verifyPhoneNumberFragment"
+            app:destination="@id/verifyPhoneNumberFragment"
+            app:enterAnim="@anim/enter_from_right"
+            app:exitAnim="@anim/exit_to_left"
+            app:popEnterAnim="@anim/enter_from_left"
+            app:popExitAnim="@anim/exit_to_right" />
+    </fragment>
+    <fragment
+        android:id="@+id/verifyPhoneNumberFragment"
+        android:name="com.oleksii.simplechat.authentication.VerifyPhoneNumberFragment"
+        android:label="fragment_verify_phone_number"
+        tools:layout="@layout/fragment_verify_phone_number">
+        <action
+            android:id="@+id/action_verifyPhoneNumberFragment_to_enterPhoneNumberFragment"
+            app:destination="@id/enterPhoneNumberFragment"
+            app:enterAnim="@anim/enter_from_left"
+            app:exitAnim="@anim/exit_to_right"
+            app:popEnterAnim="@anim/enter_from_right"
+            app:popExitAnim="@anim/exit_to_left" />
+        <argument
+            android:name="countrycode"
+            app:argType="string" />
+        <argument
+            android:name="phonenumber"
+            app:argType="string" />
     </fragment>
 </navigation>

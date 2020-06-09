@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".authentication.VerifyPhoneNumberActivity">
+    tools:context=".authentication.VerifyPhoneNumberFragment">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
@@ -30,7 +30,7 @@
         android:layout_width="125dp"
         android:layout_height="125dp"
         android:src="@drawable/verification_code_sent"
-        android:layout_marginTop="@dimen/standard"
+        android:layout_marginTop="@dimen/big_margin"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/appBarLayout"

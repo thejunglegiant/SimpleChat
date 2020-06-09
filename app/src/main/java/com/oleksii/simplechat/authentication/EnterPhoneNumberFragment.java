@@ -46,12 +46,12 @@ public class EnterPhoneNumberFragment extends Fragment {
         fab.setOnClickListener(v -> {
             if (PhoneNumberEditText.validatePhoneNumber(phoneNumberText.getText().toString())
                 && CountriesCodes.getIndex(countryCodeText.getText().toString().substring(1)) != -1) {
-//                Toast.makeText(getContext(), "All done", Toast.LENGTH_SHORT)
-//                        .show();
-                Intent intent = new Intent(getActivity(), VerifyPhoneNumberActivity.class);
-                intent.putExtra("countryCode", countryCodeText.getText().toString().trim());
-                intent.putExtra("phoneNumber", phoneNumberText.getText().toString().replace(" ", ""));
-                startActivity(intent);
+                Bundle bundle = new Bundle();
+                bundle.putString("countryCode", countryCodeText.getText().toString().trim());
+                bundle.putString("phoneNumber", phoneNumberText.getText().toString().replace(" ", ""));
+                Navigation.findNavController(v).navigate(
+                        R.id.action_enterPhoneNumberFragment_to_verifyPhoneNumberFragment, bundle
+                );
             } else {
                 Toast.makeText(getContext(), R.string.phone_number_is_incorrect, Toast.LENGTH_SHORT)
                         .show();
