@@ -68,9 +68,14 @@ public class GoogleSignInActivity extends AppCompatActivity {
         auth.signInWithCredential(credential)
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
-                        Intent intent = new Intent(this, MainActivity.class);
+                        Intent intent;
+                        if (task.getResult().getAdditionalUserInfo().isNewUser()) {
+                            intent = new Intent(this, AskNameActivity.class);
+                        } else {
+                            intent = new Intent(this, MainActivity.class);
+                        }
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(intent);
-                        GoogleSignInActivity.this.finish();
                     } else {
                         // If sign in fails, display a message to the user.
                         Log.w(TAG, "signInWithCredential:failure", task.getException());

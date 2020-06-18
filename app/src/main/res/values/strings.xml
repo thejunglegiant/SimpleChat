@@ -28,4 +28,10 @@
     <string name="stop">Stop</string>
     <string name="_continue">Continue</string>
     <string name="if_something_went_wrong"><a href="#">If something went wrong -- contact us.</a></string>
+    <string name="your_name">Your name</string>
+    <string name="logo_image">Logo image</string>
+    <string name="finally_enter_your_name_and_surname"><b>Finally,</b> enter your name and surname!</string>
+    <string name="name">Name</string>
+    <string name="surname">Surname</string>
+    <string name="wrong_name_or_surname">Wrong name or surname!</string>
 </resources>

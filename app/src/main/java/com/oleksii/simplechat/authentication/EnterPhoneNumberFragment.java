@@ -1,6 +1,5 @@
 package com.oleksii.simplechat.authentication;
 
-import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.appcompat.widget.Toolbar;
@@ -22,7 +21,7 @@ import android.widget.Toast;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.oleksii.simplechat.utils.CountriesCodes;
 import com.oleksii.simplechat.R;
-import com.oleksii.simplechat.utils.PhoneNumberEditText;
+import com.oleksii.simplechat.customviews.PhoneNumberEditText;
 
 public class EnterPhoneNumberFragment extends Fragment {
 

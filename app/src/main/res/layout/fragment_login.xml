@@ -57,14 +57,14 @@
             android:id="@+id/google_button"
             android:layout_width="61dp"
             android:layout_height="61dp"
-            android:layout_marginEnd="@dimen/standard"
+            android:layout_marginEnd="@dimen/def_margin"
             android:background="@drawable/gcustom_button"
             android:contentDescription="@string/google_plus" />
         <ImageButton
             android:id="@+id/phone_button"
             android:layout_width="61dp"
             android:layout_height="61dp"
-            android:layout_marginStart="@dimen/standard"
+            android:layout_marginStart="@dimen/def_margin"
             android:background="@drawable/phcustom_button"
             android:contentDescription="@string/facebook" />
 

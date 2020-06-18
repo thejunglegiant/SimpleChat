@@ -41,7 +41,7 @@
         android:id="@+id/country_code_text"
         android:layout_width="75dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/standard"
+        android:layout_marginTop="@dimen/def_margin"
         android:paddingHorizontal="10dp"
         android:inputType="phone"
         android:importantForAutofill="no"
@@ -54,15 +54,15 @@
         app:layout_constraintTop_toBottomOf="@+id/countries_list"
         tools:ignore="HardcodedText" />
 
-    <com.oleksii.simplechat.utils.PhoneNumberEditText
+    <com.oleksii.simplechat.customviews.PhoneNumberEditText
         style="@style/textStandard"
         android:id="@+id/phone_number_text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/standard"
+        android:layout_marginTop="@dimen/def_margin"
         android:importantForAutofill="no"
         android:paddingHorizontal="10dp"
-        android:layout_marginLeft="@dimen/standard"
+        android:layout_marginLeft="@dimen/def_margin"
         android:singleLine="true"
         android:imeOptions="actionDone"
         app:layout_constraintEnd_toEndOf="@+id/countries_list"
@@ -74,7 +74,7 @@
         android:id="@+id/textView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/standard"
+        android:layout_marginTop="@dimen/def_margin"
         android:text="@string/please_confirm_your_country_code_and_enter_your_phone_number"
         app:layout_constraintEnd_toEndOf="@+id/countries_list"
         app:layout_constraintStart_toStartOf="@+id/countries_list"
@@ -84,7 +84,7 @@
         android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/standard"
+        android:layout_margin="@dimen/def_margin"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@drawable/ic_arrow_forward" />

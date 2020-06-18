@@ -8,4 +8,19 @@
     <color name="colorLightGray">#C4C4C4</color>
     <color name="colorWhite">#FFFFFF</color>
     <color name="colorRed800">#c62828</color>
+    <color name="colorLightRed">#E66650</color>
+    <color name="colorOrange">#F68C40</color>
+    <color name="colorLightPurple">#8E82F3</color>
+    <color name="colorLightGreen">#74CB45</color>
+    <color name="colorTurquoise">#5ABCD8</color>
+    <color name="colorPink">#F37197</color>
+
+    <array name="userLogoColors">
+        <item>@color/colorLightRed</item>
+        <item>@color/colorOrange</item>
+        <item>@color/colorLightPurple</item>
+        <item>@color/colorLightGreen</item>
+        <item>@color/colorTurquoise</item>
+        <item>@color/colorPink</item>
+    </array>
 </resources>

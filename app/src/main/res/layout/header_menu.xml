@@ -3,40 +3,42 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="160dp"
+    android:layout_height="wrap_content"
+    android:paddingBottom="@dimen/def_margin"
     android:background="@color/colorPrimary">
 
-    <ImageView
-        android:layout_width="61dp"
-        android:layout_height="61dp"
-        android:layout_margin="@dimen/standard"
+    <com.oleksii.simplechat.customviews.UserLogoView
+        android:id="@+id/user_logo"
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:layout_marginTop="@dimen/huge_margin"
+        android:layout_marginStart="@dimen/def_margin"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:src="@drawable/profile_debug"
-        android:contentDescription="@string/profile_image" />
+        tools:text="KA" />
 
     <TextView
-        android:id="@+id/textView4"
+        android:id="@+id/user_name"
+        style="@style/textHighlighted"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/roboto_medium"
         android:textColor="@color/colorWhite"
-        android:textSize="18sp"
+        android:layout_marginTop="@dimen/def_margin"
         app:layout_constraintBottom_toTopOf="@+id/textView5"
         app:layout_constraintStart_toStartOf="@+id/textView5"
+        app:layout_constraintTop_toBottomOf="@+id/user_logo"
         tools:text="Mark Spencer" />
 
     <TextView
         android:id="@+id/textView5"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/standard"
-        android:layout_marginBottom="@dimen/standard"
+        android:layout_marginStart="@dimen/def_margin"
         android:fontFamily="@font/roboto_light"
         android:textColor="@color/colorWhite"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        tools:text="\@thejunglegiant" />
+        tools:text="online" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

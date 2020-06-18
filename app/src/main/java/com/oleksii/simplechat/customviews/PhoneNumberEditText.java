@@ -1,4 +1,4 @@
-package com.oleksii.simplechat.utils;
+package com.oleksii.simplechat.customviews;
 
 import android.content.Context;
 import android.text.Editable;

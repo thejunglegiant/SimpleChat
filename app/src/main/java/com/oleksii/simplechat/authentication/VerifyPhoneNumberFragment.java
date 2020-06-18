@@ -23,7 +23,7 @@ import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
 import com.oleksii.simplechat.MainActivity;
 import com.oleksii.simplechat.R;
-import com.oleksii.simplechat.utils.PhoneNumberEditText;
+import com.oleksii.simplechat.customviews.PhoneNumberEditText;
 
 import java.util.concurrent.TimeUnit;
 
@@ -86,7 +86,12 @@ public class VerifyPhoneNumberFragment extends Fragment {
         auth.signInWithCredential(credential)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        Intent intent = new Intent(getActivity(), MainActivity.class);
+                        Intent intent;
+                        if (task.getResult().getAdditionalUserInfo().isNewUser()) {
+                            intent = new Intent(getContext(), AskNameActivity.class);
+                        } else {
+                            intent = new Intent(getContext(), MainActivity.class);
+                        }
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(intent);
                     } else {
