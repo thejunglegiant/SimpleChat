@@ -1,132 +1,131 @@
 package com.oleksii.simplechat;
 
-import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.MenuItemHoverListener;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.view.MenuCompat;
+import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.FragmentManager;
+import androidx.navigation.Navigation;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.Log;
-import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 
-import com.github.nkzawa.emitter.Emitter;
-import com.github.nkzawa.socketio.client.IO;
-import com.github.nkzawa.socketio.client.Socket;
 import com.google.android.material.navigation.NavigationView;
-import com.oleksii.simplechat.mainflow.ChatsListFragment;
+import com.google.firebase.auth.FirebaseAuth;
+import com.oleksii.simplechat.authentication.SplashScreenActivity;
+import com.oleksii.simplechat.customviews.LogoView;
+import com.oleksii.simplechat.objects.User;
+import com.oleksii.simplechat.utils.IUserRest;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import java.sql.Timestamp;
 
-import java.net.URISyntaxException;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity
+        implements NavigationView.OnNavigationItemSelectedListener {
 
+    public static final String urlString = "http://10.0.2.2:3000/";
     private static final String TAG = "MainActivity";
-    private DrawerLayout drawerLayout;
-    private NavigationView navigationView;
-    private Toolbar toolbar;
-
-    private Socket mSocket;
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        super.onCreateOptionsMenu(menu);
-        getMenuInflater().inflate(R.menu.menu_toolbar, menu);
-        return true;
-    }
+    private static String name, surname;
+    public NavigationView navigationView;
+    private DrawerLayout mDrawerLayout;
+    private IUserRest IUserRest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        drawerLayout = findViewById(R.id.drawer_layout);
+        name = getIntent().getStringExtra("name");
+        surname = getIntent().getStringExtra("surname");
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(urlString)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        IUserRest = retrofit.create(IUserRest.class);
+
+        mDrawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.nav_view);
-        toolbar = findViewById(R.id.toolbar);
+        navigationView.setNavigationItemSelectedListener(this);
 
-        setSupportActionBar(toolbar);
-
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar,
-                R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawerLayout.addDrawerListener(toggle);
-        toggle.syncState();
-
-        ChatsListFragment chatsListFragment = new ChatsListFragment();
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction()
-                .add(R.id.nav_host_fragment, chatsListFragment)
-                .commit();
-
-//        try {
-//            mSocket = IO.socket("http://10.0.2.2:3000/");
-//        } catch (URISyntaxException e) {
-//            e.printStackTrace();
-//        }
-//        mSocket.on("new message", onNewMessage);
-//        mSocket.connect();
+        loginUser();
     }
 
-//    private Emitter.Listener connectionAttempt = new Emitter.Listener() {
-//        @Override
-//        public void call(final Object... args) {
-//            runOnUiThread(new Runnable() {
-//                @Override
-//                public void run() {
-//                    messageHandler.setText("works");
-//                }
-//            });
-//        }
-//    };
-//
-//    private Emitter.Listener onNewMessage = new Emitter.Listener() {
-//        @Override
-//        public void call(final Object... args) {
-//            runOnUiThread(new Runnable() {
-//                @Override
-//                public void run() {
-//                    JSONObject data = (JSONObject) args[0];
-//                    Log.i(TAG, data.toString());
-//                    String username;
-//                    String message;
-//                    try {
-//                        username = data.getString("username");
-//                        message = data.getString("message");
-//                    } catch (JSONException e) {
-//                        return;
-//                    }
-//
-//                    // add the message to view
-//                    String str = messageHandler.getText() + "\n" + username + ": " + message;
-//                    messageHandler.setText(str);
-//                }
-//            });
-//        }
-//    };
-//
-//    private void attemptSend() {
-//        String message = editText.getText().toString().trim();
-//        if (TextUtils.isEmpty(message)) {
-//            return;
-//        }
-//
-//        editText.setText("");
-//        mSocket.emit("new message", message);
-//    }
-//
-//    @Override
-//    public void onDestroy() {
-//        super.onDestroy();
-//
-//        mSocket.disconnect();
-//        mSocket.off("new message", onNewMessage);
-//    }
+    public void toggleDrawer() {
+        if (!mDrawerLayout.isOpen()) {
+            mDrawerLayout.openDrawer(GravityCompat.START);
+        } else {
+            mDrawerLayout.closeDrawer(GravityCompat.START);
+        }
+    }
+
+    private void loginUser() {
+        User user = new User(FirebaseAuth.getInstance().getCurrentUser().getUid(),
+                name, surname, new Timestamp(System.currentTimeMillis()));
+
+        Call<User> call = IUserRest.registerUser(user);
+        call.enqueue(new Callback<User>() {
+            @Override
+            public void onResponse(@NonNull Call<User> call, @NonNull Response<User> response) {
+                if (!response.isSuccessful()) {
+                    Log.e(TAG, "Code: " + response.code());
+                    Intent intent = new Intent(getApplicationContext(), SplashScreenActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                }
+
+                User user = response.body();
+                if (user != null) {
+                    MainActivity.name = user.getFirstname();
+                    MainActivity.surname = user.getLastname();
+
+                    View headerView = navigationView.getHeaderView(0);
+                    TextView textView = headerView.findViewById(R.id.user_name);
+                    LogoView logoView = headerView.findViewById(R.id.user_logo);
+                    String str = user.getFirstname() + " " + user.getLastname();
+                    logoView.addText(str);
+                    textView.setText(str);
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<User> call, @NonNull Throwable t) {
+                Log.e(TAG, t.getMessage());
+            }
+        });
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+        switch (menuItem.getItemId()) {
+            case R.id.new_group:
+                // TODO
+                break;
+            case R.id.saved_messages:
+                // TODO
+                break;
+            case R.id.settings:
+                // TODO
+                break;
+            case R.id.faq:
+                // TODO
+                break;
+            case R.id.invite_friends:
+                Navigation.findNavController(this, R.id.fragments_container)
+                        .navigate(R.id.action_chatsListFragment_to_inviteFriendsFragment);
+                toggleDrawer();
+                break;
+            default:
+                return false;
+        }
+        return true;
+    }
 }

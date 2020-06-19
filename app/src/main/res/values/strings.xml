@@ -34,4 +34,5 @@
     <string name="name">Name</string>
     <string name="surname">Surname</string>
     <string name="wrong_name_or_surname">Wrong name or surname!</string>
+    <string name="online">online</string>
 </resources>

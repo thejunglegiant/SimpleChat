@@ -10,7 +10,6 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.Nullable;
@@ -19,40 +18,39 @@ import com.oleksii.simplechat.R;
 
 import java.util.Random;
 
-public class UserLogoView extends View {
+public class LogoView extends View {
     private int mCircleColor;
-    private int[] mRandomColors;
     private Paint mCirclePaint;
     private Paint mTextPaint;
     private Bitmap bitmap;
     private String mTextLogo = "";
 
-    public UserLogoView(Context context) {
+    public LogoView(Context context) {
         super(context);
 
         init(null);
     }
 
-    public UserLogoView(Context context, @Nullable AttributeSet attrs) {
+    public LogoView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
 
         init(attrs);
     }
 
-    public UserLogoView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public LogoView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
 
         init(attrs);
     }
 
-    public UserLogoView(Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    public LogoView(Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
 
         init(attrs);
     }
 
     private void init(@Nullable AttributeSet set) {
-        mRandomColors = getResources().getIntArray(R.array.userLogoColors);
+        int[] mRandomColors = getResources().getIntArray(R.array.userLogoColors);
         mCirclePaint = new Paint();
         mCirclePaint.setColor(mRandomColors[new Random().nextInt(mRandomColors.length)]);
         mTextPaint = new Paint();
@@ -63,12 +61,12 @@ public class UserLogoView extends View {
         if (set == null)
             return;
 
-        TypedArray arr = getContext().obtainStyledAttributes(set, R.styleable.UserLogoView);
+        TypedArray arr = getContext().obtainStyledAttributes(set, R.styleable.LogoView);
 
-        mCircleColor = arr.getColor(R.styleable.UserLogoView_circle_color,
+        mCircleColor = arr.getColor(R.styleable.LogoView_circle_color,
                 mRandomColors[new Random().nextInt(mRandomColors.length)]);
-        if (arr.getText(R.styleable.UserLogoView_android_text) != null)
-            mTextLogo = arr.getText(R.styleable.UserLogoView_android_text).toString();
+        if (arr.getText(R.styleable.LogoView_android_text) != null)
+            mTextLogo = arr.getText(R.styleable.LogoView_android_text).toString();
 
         arr.recycle();
     }
@@ -102,10 +100,15 @@ public class UserLogoView extends View {
         cx = (float) getWidth() / 2;
         cy = (float) getHeight() / 2;
 
-        if (bitmap == null) {
+        if (bitmap == null && !mTextLogo.equals("")) {
+            String editedText = "";
+            String[] tmp = mTextLogo.split(" ");
+            for (String s : tmp) editedText += String.valueOf(s.charAt(0)).toUpperCase();
+
             canvas.drawCircle(cx, cy, cx, mCirclePaint);
-            canvas.drawText(mTextLogo, cx, cy - ((mTextPaint.descent() + mTextPaint.ascent()) / 2), mTextPaint);
-        } else {
+            canvas.drawText(editedText, cx,
+                    cy - ((mTextPaint.descent() + mTextPaint.ascent()) / 2), mTextPaint);
+        } else if (bitmap != null) {
             canvas.drawBitmap(bitmap, 0, 0, null);
         }
     }

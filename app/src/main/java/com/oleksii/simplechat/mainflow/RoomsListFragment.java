@@ -4,78 +4,112 @@ import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.Toast;
 
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.Socket;
-import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.oleksii.simplechat.MainActivity;
 import com.oleksii.simplechat.R;
-import com.oleksii.simplechat.adapters.ChatsListAdapter;
+import com.oleksii.simplechat.adapters.RoomsListAdapter;
+import com.oleksii.simplechat.objects.ChatObject;
+import com.oleksii.simplechat.objects.Message;
+import com.oleksii.simplechat.utils.IUserRest;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class ChatsListFragment extends Fragment {
+import java.sql.Date;
+import java.util.ArrayList;
 
-    private static final String TAG = "ChatsListFragment";
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
+public class RoomsListFragment extends Fragment {
+
+    private static final String TAG = "RoomsListFragment";
     private MainActivity parentActivity;
+    private RoomsListAdapter adapter;
+    private IUserRest IUserRest;
     public Socket mSocket;
 
-    public ChatsListFragment() { }
-
-//    @Override
-//    public void onAttach(@NonNull Context context) {
-//        super.onAttach(context);
-//        parentActivity = (MainActivity) getActivity();
-//        if (parentActivity != null && parentActivity.getSupportActionBar() != null)
-//            parentActivity.getSupportActionBar().hide();
-//    }
+    public RoomsListFragment() { }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        parentActivity = (MainActivity) getActivity();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_chats_list, container, false);
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(MainActivity.urlString)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        IUserRest = retrofit.create(IUserRest.class);
 
-        if (getActivity() != null)
-            mSocket = ((MainActivity) getActivity()).mSocket;
+        View rootView = inflater.inflate(R.layout.fragment_rooms_list, container, false);
 
+        Toolbar toolbar = rootView.findViewById(R.id.toolbar);
+        toolbar.inflateMenu(R.menu.toolbar_main);
+        toolbar.setOnMenuItemClickListener(item -> {
+            if (item.getItemId() == R.id.search_button) {
+                Log.i(TAG, item.getItemId() + "");
+                return true;
+            }
+            return super.onOptionsItemSelected(item);
+        });
+        toolbar.setNavigationOnClickListener(v -> {
+            parentActivity.toggleDrawer();
+        });
+
+        RecyclerView chatsList = rootView.findViewById(R.id.chats_list);
+        chatsList.setLayoutManager(new LinearLayoutManager(getContext()));
+        adapter = new RoomsListAdapter(new ArrayList<>(), getContext());
+        chatsList.setAdapter(adapter);
+
+        RoomsListViewModel viewModel = new ViewModelProvider(this).get(RoomsListViewModel.class);
+
+        viewModel.setCurrentUser(new ChatObject("Chat#1", new Message("Hello Vasya", new Date(1)), false));
+        viewModel.setCurrentUser(new ChatObject("OOP FIOT", new Message("Hello Vasya", new Date(1)), false));
+
+        viewModel.rooms.observe(getViewLifecycleOwner(), rooms -> {
+            adapter.submitAll(rooms);
+        });
+//        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar,
+//                R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+//        drawerLayout.addDrawerListener(toggle);
+//        toggle.syncState();
 
         Button button = rootView.findViewById(R.id.test_button);
         button.setOnClickListener(v -> {
-            mSocket.emit("verify_user", FirebaseAuth.getInstance().getUid());
+            FirebaseAuth.getInstance().signOut();
+            FirebaseAuth.getInstance().getCurrentUser().delete();
         });
-        mSocket.on("verified", onNewMessage);
 
-//        RecyclerView chatsList = rootView.findViewById(R.id.chats_list);
-//        ChatsListAdapter adapter = new ChatsListAdapter(this, );
-//        chatsList.setAdapter(adapter);
+//        mSocket.on("register", onRegisterRequired);
 
         return rootView;
     }
+
+    private Emitter.Listener onRegisterRequired = args -> getActivity().runOnUiThread(new Runnable() {
+        @Override
+        public void run() {
+
+        }
+    });
 
     private Emitter.Listener onNewMessage = args -> getActivity().runOnUiThread(new Runnable() {
         @Override
@@ -96,26 +130,4 @@ public class ChatsListFragment extends Fragment {
             Log.i(TAG, str);
         }
     });
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-
-        mSocket.disconnect();
-        mSocket.off("new message", onNewMessage);
-    }
-
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.toolbar_main, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        int id = item.getItemId();
-        Log.i("ChatsListFragment", String.valueOf(id));
-
-        return super.onOptionsItemSelected(item);
-    }
 }

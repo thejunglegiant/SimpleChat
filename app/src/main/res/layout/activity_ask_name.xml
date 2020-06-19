@@ -76,7 +76,7 @@
         android:layout_height="wrap_content"
         android:hint="@string/name"
         android:maxLength="20"
-        android:inputType="textPersonName"
+        android:inputType="textPersonName|textCapSentences"
         android:importantForAutofill="no"
         android:layout_marginTop="@dimen/def_margin"
         app:layout_constraintEnd_toEndOf="@+id/textView"
@@ -91,7 +91,7 @@
         android:hint="@string/surname"
         android:maxLength="20"
         android:importantForAutofill="no"
-        android:inputType="textPersonName"
+        android:inputType="textPersonName|textCapSentences"
         app:layout_constraintEnd_toEndOf="@+id/name_text"
         app:layout_constraintStart_toStartOf="@+id/name_text"
         app:layout_constraintTop_toBottomOf="@+id/name_text" />

@@ -7,12 +7,16 @@
 
     <fragment
         android:id="@+id/chatsListFragment"
-        android:name="com.oleksii.simplechat.mainflow.ChatsListFragment"
+        android:name="com.oleksii.simplechat.mainflow.RoomsListFragment"
         android:label="fragment_chats_list"
-        tools:layout="@layout/fragment_chats_list" >
+        tools:layout="@layout/fragment_rooms_list" >
         <action
             android:id="@+id/action_chatsListFragment_to_inviteFriendsFragment"
-            app:destination="@id/inviteFriendsFragment" />
+            app:destination="@id/inviteFriendsFragment"
+            app:enterAnim="@anim/enter_from_right"
+            app:exitAnim="@anim/exit_to_left"
+            app:popEnterAnim="@anim/enter_from_left"
+            app:popExitAnim="@anim/exit_to_right" />
     </fragment>
     <fragment
         android:id="@+id/inviteFriendsFragment"
