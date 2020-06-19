@@ -70,7 +70,8 @@ public class VerifyPhoneNumberFragment extends Fragment {
 
         TextView contactUs = rootview.findViewById(R.id.contact_us);
         contactUs.setOnClickListener(v -> {
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/thejunglegiant"));
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW,
+                    Uri.parse(getResources().getString(R.string.author_contact)));
             startActivity(browserIntent);
         });
 

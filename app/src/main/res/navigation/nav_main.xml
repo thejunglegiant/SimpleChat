@@ -22,5 +22,13 @@
         android:id="@+id/inviteFriendsFragment"
         android:name="com.oleksii.simplechat.otherscreens.InviteFriendsFragment"
         android:label="fragment_invite_friends"
-        tools:layout="@layout/fragment_invite_friends" />
+        tools:layout="@layout/fragment_invite_friends" >
+        <action
+            android:id="@+id/action_inviteFriendsFragment_to_chatsListFragment"
+            app:destination="@id/chatsListFragment"
+            app:enterAnim="@anim/enter_from_left"
+            app:exitAnim="@anim/exit_to_right"
+            app:popEnterAnim="@anim/enter_from_right"
+            app:popExitAnim="@anim/exit_to_left" />
+    </fragment>
 </navigation>

@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -88,10 +89,6 @@ public class RoomsListFragment extends Fragment {
         viewModel.rooms.observe(getViewLifecycleOwner(), rooms -> {
             adapter.submitAll(rooms);
         });
-//        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar,
-//                R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-//        drawerLayout.addDrawerListener(toggle);
-//        toggle.syncState();
 
         Button button = rootView.findViewById(R.id.test_button);
         button.setOnClickListener(v -> {
