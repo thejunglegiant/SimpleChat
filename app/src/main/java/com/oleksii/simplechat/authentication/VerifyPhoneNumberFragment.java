@@ -10,6 +10,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +30,7 @@ import java.util.concurrent.TimeUnit;
 
 public class VerifyPhoneNumberFragment extends Fragment {
 
+    private static final String TAG = "VerifyPhoneNumberFragment";
     private String verificationId;
     private FirebaseAuth auth;
 
@@ -50,10 +52,10 @@ public class VerifyPhoneNumberFragment extends Fragment {
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             builder.setTitle(R.string.simple_chat);
             builder.setMessage(R.string.stop_verification_process)
-                    .setPositiveButton(R.string._continue, (DialogInterface.OnClickListener) (dialog, id) -> {
+                    .setPositiveButton(R.string._continue, (dialog, id) -> {
                         // Just continue
                     })
-                    .setNegativeButton(R.string.stop, (DialogInterface.OnClickListener) (dialog, id) -> {
+                    .setNegativeButton(R.string.stop, (dialog, id) -> {
                         Navigation.findNavController(v).navigate(
                                 R.id.action_verifyPhoneNumberFragment_to_enterPhoneNumberFragment
                         );
@@ -62,7 +64,7 @@ public class VerifyPhoneNumberFragment extends Fragment {
         });
 
         EditText codeVerification = rootview.findViewById(R.id.code_text);
-        codeVerification.setOnEditorActionListener((TextView.OnEditorActionListener) (v, actionId, event) -> {
+        codeVerification.setOnEditorActionListener((v, actionId, event) -> {
             String code = codeVerification.getText().toString().trim();
             verifyCode(code);
             return true;
@@ -130,7 +132,7 @@ public class VerifyPhoneNumberFragment extends Fragment {
 
         @Override
         public void onVerificationFailed(@NonNull FirebaseException e) {
-            Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+            Log.e(TAG, e.getMessage());
         }
     };
 }

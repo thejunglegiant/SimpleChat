@@ -40,4 +40,11 @@
     <string name="or">or</string>
     <string name="check_out_this_perfect_chat">Check out this perfect chat!</string>
     <string name="github_author_url">https://github.com/thejunglegiant/SimpleChat</string>
+    <string name="enter_group_name">Enter group name</string>
+    <string name="tick_logo">Tick logo</string>
+    <string name="members">members</string>
+    <string name="member">member</string>
+    <string name="need_to_add_at_least_2_users">You need to add at least two users!</string>
+    <string name="enter_group_name_first">Enter group name first!</string>
+    <string name="no_messages_yet">No messages yet</string>
 </resources>

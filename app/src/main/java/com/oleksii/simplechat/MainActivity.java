@@ -13,12 +13,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.github.nkzawa.socketio.client.Socket;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.oleksii.simplechat.authentication.SplashScreenActivity;
 import com.oleksii.simplechat.customviews.LogoView;
 import com.oleksii.simplechat.objects.User;
-import com.oleksii.simplechat.utils.IUserRest;
+import com.oleksii.simplechat.utils.Constants;
+import com.oleksii.simplechat.utils.IRest;
 
 import java.sql.Timestamp;
 
@@ -31,12 +33,11 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    public static final String urlString = "http://10.0.2.2:3000/";
     private static final String TAG = "MainActivity";
     private static String name, surname;
     public NavigationView navigationView;
     private DrawerLayout mDrawerLayout;
-    private IUserRest IUserRest;
+    private IRest IRest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,10 +48,10 @@ public class MainActivity extends AppCompatActivity
         surname = getIntent().getStringExtra("surname");
 
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(urlString)
+                .baseUrl(Constants.CHAT_SERVER_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
-        IUserRest = retrofit.create(IUserRest.class);
+        IRest = retrofit.create(IRest.class);
 
         mDrawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.nav_view);
@@ -71,7 +72,7 @@ public class MainActivity extends AppCompatActivity
         User user = new User(FirebaseAuth.getInstance().getCurrentUser().getUid(),
                 name, surname, new Timestamp(System.currentTimeMillis()));
 
-        Call<User> call = IUserRest.registerUser(user);
+        Call<User> call = IRest.registerUser(user);
         call.enqueue(new Callback<User>() {
             @Override
             public void onResponse(@NonNull Call<User> call, @NonNull Response<User> response) {
@@ -107,7 +108,9 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
         switch (menuItem.getItemId()) {
             case R.id.new_group:
-                // TODO
+                Navigation.findNavController(this, R.id.fragments_container)
+                        .navigate(R.id.action_chatsListFragment_to_newGroupFragment);
+                toggleDrawer();
                 break;
             case R.id.saved_messages:
                 // TODO

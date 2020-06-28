@@ -82,6 +82,8 @@ public class EasyCopyEditText extends androidx.appcompat.widget.AppCompatEditTex
                         showButton();
                         return true;
                     }
+                } else {
+                    setSelection(0);
                 }
 
                 return false;
