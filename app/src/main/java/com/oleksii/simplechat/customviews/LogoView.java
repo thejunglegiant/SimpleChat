@@ -10,6 +10,7 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.Nullable;
@@ -19,6 +20,9 @@ import com.oleksii.simplechat.R;
 import java.util.Random;
 
 public class LogoView extends View {
+
+    private final float TEXT_SIZE_COEFFICIENT = 0.43f;
+
     private int mCircleColor;
     private Paint mCirclePaint;
     private Paint mTextPaint;
@@ -56,7 +60,6 @@ public class LogoView extends View {
         mTextPaint = new Paint();
         mTextPaint.setColor(Color.WHITE);
         mTextPaint.setTextAlign(Paint.Align.CENTER);
-        mTextPaint.setTextSize(100f);
 
         if (set == null)
             return;
@@ -95,15 +98,21 @@ public class LogoView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        float cx, cy;
 
+        float cx, cy;
         cx = (float) getWidth() / 2;
         cy = (float) getHeight() / 2;
+
+        mTextPaint.setTextSize(getWidth() * TEXT_SIZE_COEFFICIENT);
 
         if (bitmap == null && !mTextLogo.equals("")) {
             String editedText = "";
             String[] tmp = mTextLogo.split(" ");
-            for (String s : tmp) editedText += String.valueOf(s.charAt(0)).toUpperCase();
+            for (String s : tmp) {
+                editedText += String.valueOf(s.charAt(0)).toUpperCase();
+                if (editedText.length() > 1)
+                    break;
+            }
 
             canvas.drawCircle(cx, cy, cx, mCirclePaint);
             canvas.drawText(editedText, cx,

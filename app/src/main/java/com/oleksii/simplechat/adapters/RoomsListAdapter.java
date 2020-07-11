@@ -1,6 +1,6 @@
 package com.oleksii.simplechat.adapters;
 
-import android.content.Context;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,6 +8,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.oleksii.simplechat.R;
@@ -20,11 +21,9 @@ import java.util.ArrayList;
 public class RoomsListAdapter extends RecyclerView.Adapter<RoomsListAdapter.ViewHolder> {
 
     private ArrayList<ListRoom> list;
-    private Context context;
 
-    public RoomsListAdapter(ArrayList<ListRoom> list, Context context) {
+    public RoomsListAdapter(ArrayList<ListRoom> list) {
         this.list = list;
-        this.context = context;
     }
 
     public void submitAll(ArrayList<ListRoom> list) {
@@ -46,15 +45,24 @@ public class RoomsListAdapter extends RecyclerView.Adapter<RoomsListAdapter.View
         holder.logoView.addText(obj.getTitle());
         holder.title.setText(obj.getTitle());
         if (obj.getLastMessage() == null || obj.getLastActivity() == null) {
+            holder.whoSent.setVisibility(View.GONE);
+            holder.lastMessageTime.setVisibility(View.GONE);
             holder.lastMessage.setText(R.string.no_messages_yet);
         } else {
+            holder.whoSent.setVisibility(View.VISIBLE);
+            holder.lastMessageTime.setVisibility(View.VISIBLE);
             holder.whoSent.setText(obj.getFirstname() + ": ");
             holder.lastMessage.setText(obj.getLastMessage());
             holder.lastMessageTime.setText(Util.getTimeString(obj.getLastActivity(), false));
         }
 
         holder.mainLayout.setOnClickListener(v -> {
-            // TODO
+            Bundle bundle = new Bundle();
+            bundle.putLong("roomId", obj.getId());
+            bundle.putString("roomTitle", obj.getTitle());
+            Navigation.findNavController(v).navigate(
+                    R.id.action_chatsListFragment_to_exactRoomFragment, bundle
+            );
         });
     }
 
@@ -75,7 +83,7 @@ public class RoomsListAdapter extends RecyclerView.Adapter<RoomsListAdapter.View
             whoSent = itemView.findViewById(R.id.who_sent);
             lastMessage = itemView.findViewById(R.id.last_seen_text);
             lastMessageTime = itemView.findViewById(R.id.date_time);
-            logoView = itemView.findViewById(R.id.chat_logo);
+            logoView = itemView.findViewById(R.id.room_logo);
             mainLayout = itemView.findViewById(R.id.main_layout);
         }
 

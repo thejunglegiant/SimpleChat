@@ -1,4 +1,4 @@
-package com.oleksii.simplechat.mainflow;
+package com.oleksii.simplechat.roomslistfragment;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
@@ -6,11 +6,11 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.oleksii.simplechat.ChatApplication;
 
-public class MyViewModelFactory implements ViewModelProvider.Factory {
+public class RoomListVMFactory implements ViewModelProvider.Factory {
 
     ChatApplication app;
 
-    public MyViewModelFactory(ChatApplication app) {
+    public RoomListVMFactory(ChatApplication app) {
         this.app = app;
     }
 

@@ -1,6 +1,7 @@
 package com.oleksii.simplechat.utils;
 
 import com.oleksii.simplechat.objects.ListRoom;
+import com.oleksii.simplechat.objects.Message;
 import com.oleksii.simplechat.objects.NewRoom;
 import com.oleksii.simplechat.objects.User;
 
@@ -25,4 +26,7 @@ public interface IRest {
 
     @GET
     Call<ArrayList<ListRoom>> getAvailableRooms(@Url String url);
+
+    @GET
+    Call<ArrayList<Message>> getAllRoomMessages(@Url String url);
 }

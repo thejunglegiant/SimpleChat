@@ -3,11 +3,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_main"
-    app:startDestination="@id/chatsListFragment">
+    app:startDestination="@id/roomsListFragment">
 
     <fragment
-        android:id="@+id/chatsListFragment"
-        android:name="com.oleksii.simplechat.mainflow.RoomsListFragment"
+        android:id="@+id/roomsListFragment"
+        android:name="com.oleksii.simplechat.roomslistfragment.RoomsListFragment"
         android:label="fragment_chats_list"
         tools:layout="@layout/fragment_rooms_list" >
         <action
@@ -24,6 +24,13 @@
             app:exitAnim="@anim/exit_to_left"
             app:popEnterAnim="@anim/enter_from_left"
             app:popExitAnim="@anim/exit_to_right" />
+        <action
+            android:id="@+id/action_chatsListFragment_to_exactRoomFragment"
+            app:destination="@id/exactRoomFragment"
+            app:enterAnim="@anim/enter_from_right"
+            app:exitAnim="@anim/exit_to_left"
+            app:popEnterAnim="@anim/enter_from_left"
+            app:popExitAnim="@anim/exit_to_right" />
     </fragment>
     <fragment
         android:id="@+id/inviteFriendsFragment"
@@ -32,7 +39,7 @@
         tools:layout="@layout/fragment_invite_friends" >
         <action
             android:id="@+id/action_inviteFriendsFragment_to_chatsListFragment"
-            app:destination="@id/chatsListFragment"
+            app:destination="@id/roomsListFragment"
             app:enterAnim="@anim/enter_from_left"
             app:exitAnim="@anim/exit_to_right"
             app:popEnterAnim="@anim/enter_from_right"
@@ -52,8 +59,8 @@
             app:popExitAnim="@anim/exit_to_left" />
         <action
             android:id="@+id/action_finallyCreateGroupFragment_to_chatsListFragment"
-            app:destination="@id/chatsListFragment"
-            app:popUpTo="@+id/chatsListFragment"
+            app:destination="@id/roomsListFragment"
+            app:popUpTo="@+id/roomsListFragment"
             app:popUpToInclusive="true"
             app:enterAnim="@anim/enter_from_right"
             app:exitAnim="@anim/exit_to_left"
@@ -67,7 +74,7 @@
         tools:layout="@layout/fragment_new_group">
         <action
             android:id="@+id/action_newGroupFragment_to_chatsListFragment"
-            app:destination="@id/chatsListFragment"
+            app:destination="@id/roomsListFragment"
             app:enterAnim="@anim/enter_from_left"
             app:exitAnim="@anim/exit_to_right"
             app:popEnterAnim="@anim/enter_from_right"
@@ -79,5 +86,24 @@
             app:exitAnim="@anim/exit_to_left"
             app:popEnterAnim="@anim/enter_from_left"
             app:popExitAnim="@anim/exit_to_right" />
+    </fragment>
+    <fragment
+        android:id="@+id/exactRoomFragment"
+        android:name="com.oleksii.simplechat.exactroomfragment.ExactRoomFragment"
+        android:label="fragment_exact_room"
+        tools:layout="@layout/fragment_exact_room" >
+        <action
+            android:id="@+id/action_exactRoomFragment_to_chatsListFragment"
+            app:destination="@id/roomsListFragment"
+            app:enterAnim="@anim/enter_from_left"
+            app:exitAnim="@anim/exit_to_right"
+            app:popEnterAnim="@anim/enter_from_right"
+            app:popExitAnim="@anim/exit_to_left" />
+        <argument
+            android:name="roomId"
+            app:argType="long" />
+        <argument
+            android:name="roomTitle"
+            app:argType="string" />
     </fragment>
 </navigation>

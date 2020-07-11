@@ -1,4 +1,4 @@
-package com.oleksii.simplechat.mainflow;
+package com.oleksii.simplechat.roomslistfragment;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -15,7 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.oleksii.simplechat.ChatApplication;
+import com.google.firebase.auth.FirebaseAuth;
 import com.oleksii.simplechat.MainActivity;
 import com.oleksii.simplechat.R;
 import com.oleksii.simplechat.adapters.RoomsListAdapter;
@@ -26,7 +26,6 @@ public class RoomsListFragment extends Fragment {
 
     private static final String TAG = "RoomsListFragment";
     private MainActivity parentActivity;
-    private RoomsListAdapter adapter;
 
     public RoomsListFragment() { }
 
@@ -47,6 +46,8 @@ public class RoomsListFragment extends Fragment {
             if (item.getItemId() == R.id.search_button) {
                 Log.i(TAG, item.getItemId() + "");
                 // TODO
+                // temporary
+                FirebaseAuth.getInstance().signOut();
                 return true;
             }
             return super.onOptionsItemSelected(item);
@@ -57,15 +58,13 @@ public class RoomsListFragment extends Fragment {
 
         RecyclerView chatsList = rootView.findViewById(R.id.rooms_list);
         chatsList.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter = new RoomsListAdapter(new ArrayList<>(), getContext());
+        RoomsListAdapter adapter = new RoomsListAdapter(new ArrayList<>());
         chatsList.setAdapter(adapter);
 
-        MyViewModelFactory factory = new MyViewModelFactory((ChatApplication) getActivity().getApplication());
+        RoomListVMFactory factory = new RoomListVMFactory(parentActivity.app);
         RoomsListViewModel viewModel = new ViewModelProvider(this, factory).get(RoomsListViewModel.class);
 
-        viewModel.availableRooms.observe(getViewLifecycleOwner(), rooms -> {
-            adapter.submitAll(rooms);
-        });
+        viewModel.availableRooms.observe(getViewLifecycleOwner(), adapter::submitAll);
 
 //        Navigation.findNavController(getActivity(), R.id.fragments_container)
 //                .navigate(R.id.action_chatsListFragment_to_newGroupFragment);

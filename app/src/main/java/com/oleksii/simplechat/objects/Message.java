@@ -1,29 +1,93 @@
 package com.oleksii.simplechat.objects;
 
-import java.sql.Date;
+import com.google.gson.annotations.SerializedName;
+
+import java.sql.Timestamp;
 
 public class Message {
 
-    private String mBody;
-    private String mUsername;
-    private Date mTime;
+    private String userId;
+    private long roomId;
+    @SerializedName("issender")
+    private boolean isSender;
+    private String firstname;
+    private String lastname;
+    private String body;
+    @SerializedName("stime")
+    private Timestamp sendingTime;
 
-    public Message() {}
+    public Message(String userId, long roomId, String body) {
+        this.userId = userId;
+        this.roomId = roomId;
+        this.body = body;
+    }
 
-    public Message(String message, Date time) {
-        this.mBody = message;
-        this.mTime = time;
+    public Message(boolean isSender, String firstname, String body, Timestamp stime) {
+        this.isSender = isSender;
+        this.firstname = firstname;
+        this.body = body;
+        this.sendingTime = stime;
+    }
+
+    public Message(String firstname, String body, Timestamp sendingTime) {
+        this.firstname = firstname;
+        this.body = body;
+        this.sendingTime = sendingTime;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public long getRoomId() {
+        return roomId;
+    }
+
+    public boolean isSender() {
+        return isSender;
+    }
+
+    public String getFirstname() {
+        return firstname;
+    }
+
+    public String getLastname() {
+        return lastname;
     }
 
     public String getBody() {
-        return mBody;
-    };
+        return body;
+    }
 
-    public String getUsername() {
-        return mUsername;
-    };
+    public Timestamp getSendingTime() {
+        return sendingTime;
+    }
 
-    public Date getTime() {
-        return mTime;
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public void setRoomId(long roomId) {
+        this.roomId = roomId;
+    }
+
+    public void setSender(boolean sender) {
+        isSender = sender;
+    }
+
+    public void setFirstname(String firstname) {
+        this.firstname = firstname;
+    }
+
+    public void setLastname(String lastname) {
+        this.lastname = lastname;
+    }
+
+    public void setBody(String body) {
+        this.body = body;
+    }
+
+    public void setSendingTime(Timestamp sendingTime) {
+        this.sendingTime = sendingTime;
     }
 }

@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity
     private static final String TAG = "MainActivity";
     private static String name, surname;
     public NavigationView navigationView;
+    public ChatApplication app;
     private DrawerLayout mDrawerLayout;
     private IRest IRest;
 
@@ -52,6 +53,7 @@ public class MainActivity extends AppCompatActivity
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         IRest = retrofit.create(IRest.class);
+        app = (ChatApplication) this.getApplication();
 
         mDrawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.nav_view);
@@ -130,5 +132,9 @@ public class MainActivity extends AppCompatActivity
                 return false;
         }
         return true;
+    }
+
+    public String getName() {
+        return name;
     }
 }

@@ -44,7 +44,7 @@ public class NewGroupFragment extends Fragment {
         recyclerView.setAdapter(adapter);
 
         rootView.findViewById(R.id.fab).setOnClickListener(v -> {
-            if (viewModel.getCheckedUsers().size() > 1)
+            if (viewModel.getCheckedUsers().size() > 0)
                 Navigation.findNavController(v)
                         .navigate(R.id.action_newGroupFragment_to_finallyCreateGroupFragment);
             else

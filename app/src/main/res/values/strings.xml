@@ -47,4 +47,5 @@
     <string name="need_to_add_at_least_2_users">You need to add at least two users!</string>
     <string name="enter_group_name_first">Enter group name first!</string>
     <string name="no_messages_yet">No messages yet</string>
+    <string name="message">Message</string>
 </resources>

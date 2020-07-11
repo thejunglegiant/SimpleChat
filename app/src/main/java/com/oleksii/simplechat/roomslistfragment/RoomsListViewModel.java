@@ -1,6 +1,4 @@
-package com.oleksii.simplechat.mainflow;
-
-import android.util.Log;
+package com.oleksii.simplechat.roomslistfragment;
 
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;

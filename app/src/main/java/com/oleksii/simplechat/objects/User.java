@@ -6,7 +6,7 @@ import java.sql.Timestamp;
 
 public class User {
 
-    @SerializedName("userid")
+    @SerializedName("id")
     private String userId;
 
     private String firstname;

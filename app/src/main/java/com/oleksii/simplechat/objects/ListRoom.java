@@ -6,6 +6,7 @@ import java.sql.Timestamp;
 
 public class ListRoom {
 
+    private long id;
     private String title;
     private String firstname;
     @SerializedName("last_message")
@@ -65,5 +66,13 @@ public class ListRoom {
 
     public String getFirstname() {
         return firstname;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 }
