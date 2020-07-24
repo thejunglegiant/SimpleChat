@@ -22,6 +22,8 @@ import java.util.Random;
 public class LogoView extends View {
 
     private final float TEXT_SIZE_COEFFICIENT = 0.43f;
+    private final String alphabet = "abcdefghijklnmopqrstuvwxyz";
+    private final int[] colors = getResources().getIntArray(R.array.userLogoColors);
 
     private int mCircleColor;
     private Paint mCirclePaint;
@@ -54,9 +56,7 @@ public class LogoView extends View {
     }
 
     private void init(@Nullable AttributeSet set) {
-        int[] mRandomColors = getResources().getIntArray(R.array.userLogoColors);
         mCirclePaint = new Paint();
-        mCirclePaint.setColor(mRandomColors[new Random().nextInt(mRandomColors.length)]);
         mTextPaint = new Paint();
         mTextPaint.setColor(Color.WHITE);
         mTextPaint.setTextAlign(Paint.Align.CENTER);
@@ -67,7 +67,7 @@ public class LogoView extends View {
         TypedArray arr = getContext().obtainStyledAttributes(set, R.styleable.LogoView);
 
         mCircleColor = arr.getColor(R.styleable.LogoView_circle_color,
-                mRandomColors[new Random().nextInt(mRandomColors.length)]);
+                colors[new Random().nextInt(colors.length)]);
         if (arr.getText(R.styleable.LogoView_android_text) != null)
             mTextLogo = arr.getText(R.styleable.LogoView_android_text).toString();
 
@@ -91,6 +91,7 @@ public class LogoView extends View {
 
     public void addText(String text) {
         mTextLogo = text;
+        mCirclePaint.setColor(colors[alphabet.indexOf(String.valueOf(text.charAt(0)).toLowerCase()) % 6]);
 
         postInvalidate();
     }
