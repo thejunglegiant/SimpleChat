@@ -15,14 +15,8 @@ import retrofit2.http.Url;
 
 public interface IRest {
 
-    @POST("register")
-    Call<User> registerUser(@Body User user);
-
     @GET
     Call<ArrayList<User>> getAvailableUsers(@Url String url);
-
-    @POST
-    Call<ArrayList<NewRoom>> createNewGroup(@Url String url, @Body NewRoom newRoom);
 
     @GET
     Call<ArrayList<ListRoom>> getAvailableRooms(@Url String url);

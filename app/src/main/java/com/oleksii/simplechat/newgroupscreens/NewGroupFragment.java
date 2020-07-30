@@ -1,7 +1,9 @@
 package com.oleksii.simplechat.newgroupscreens;
 
+import android.content.Context;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -14,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.oleksii.simplechat.MainActivity;
 import com.oleksii.simplechat.R;
 import com.oleksii.simplechat.adapters.PeopleListAdapter;
 
@@ -22,8 +25,15 @@ import java.util.ArrayList;
 public class NewGroupFragment extends Fragment {
 
     private static final String TAG = "NewGroupFragment";
+    private MainActivity parentActivity;
 
     public NewGroupFragment() { }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        parentActivity = (MainActivity) getActivity();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -34,7 +44,8 @@ public class NewGroupFragment extends Fragment {
         toolbar.setNavigationOnClickListener(v -> Navigation.findNavController(v)
                 .navigate(R.id.action_newGroupFragment_to_chatsListFragment));
 
-        NewGroupViewModel viewModel = new ViewModelProvider(requireActivity())
+        NewGroupVMFactory factory = new NewGroupVMFactory(parentActivity.getSocket());
+        NewGroupViewModel viewModel = new ViewModelProvider(requireActivity(), factory)
                 .get(NewGroupViewModel.class);
         viewModel.init();
 

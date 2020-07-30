@@ -3,5 +3,6 @@
     <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="true">10.0.2.2</domain>
         <domain includeSubdomains="true">195.66.136.234</domain>
+        <domain includeSubdomains="true">simple-chat-oleksii.herokuapp.com</domain>
     </domain-config>
 </network-security-config>

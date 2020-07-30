@@ -2,6 +2,5 @@
 <resources>
     <declare-styleable name="LogoView">
         <attr name="android:text" />
-        <attr name="circle_color" format="color"/>
     </declare-styleable>
 </resources>

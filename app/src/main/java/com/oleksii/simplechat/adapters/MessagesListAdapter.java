@@ -59,10 +59,20 @@ public class MessagesListAdapter extends RecyclerView.Adapter<MessagesListAdapte
             holder.messageBody.setTextColor(context.getColor(R.color.colorBlack));
         }
 
-        if (position + 1 < list.size() && list.get(position + 1).getFirstname().equals(obj.getFirstname()))
+        if (position - 1 >= 0 && list.get(position - 1).getFirstname().equals(obj.getFirstname())
+                || obj.isSender()) {
+            holder.senderName.setVisibility(View.GONE);
+        } else {
+            holder.senderName.setVisibility(View.VISIBLE);
+        }
+
+        if (position + 1 < list.size() && list.get(position + 1).getFirstname().equals(obj.getFirstname())) {
             holder.senderLogo.setVisibility(View.INVISIBLE);
-        else
+            holder.senderLogo.setDpHeight(0);
+        } else {
+            holder.senderLogo.setDpHeight(51);
             holder.senderLogo.setVisibility(View.VISIBLE);
+        }
 
         if (obj.isSender())
             holder.senderLogo.setVisibility(View.GONE);

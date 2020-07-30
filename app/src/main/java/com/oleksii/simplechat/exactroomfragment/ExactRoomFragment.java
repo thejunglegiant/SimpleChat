@@ -44,7 +44,6 @@ public class ExactRoomFragment extends Fragment {
     private long roomId;
     private String roomTitle;
     private MainActivity parentActivity;
-    private Socket mSocket;
 
     public ExactRoomFragment() { }
 
@@ -52,7 +51,6 @@ public class ExactRoomFragment extends Fragment {
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         parentActivity = (MainActivity) getActivity();
-        mSocket = parentActivity.app.getSocket();
     }
 
     @Override
@@ -88,7 +86,7 @@ public class ExactRoomFragment extends Fragment {
         MessagesListAdapter adapter = new MessagesListAdapter(new ArrayList<>(), getContext());
         messagesList.setAdapter(adapter);
 
-        ExactRoomVMFactory factory = new ExactRoomVMFactory(parentActivity.app, roomId, parentActivity.getName());
+        ExactRoomVMFactory factory = new ExactRoomVMFactory(parentActivity.getSocket(), roomId, parentActivity.getName());
         ExactRoomViewModel viewModel = new ViewModelProvider(this, factory).get(ExactRoomViewModel.class);
         viewModel.messages.observe(getViewLifecycleOwner(), list -> {
             adapter.submitAll(list);
@@ -100,7 +98,7 @@ public class ExactRoomFragment extends Fragment {
             if (!messageBox.getText().toString().trim().isEmpty()) {
                 Message message = new Message(FirebaseAuth.getInstance().getUid(),
                         roomId, messageBox.getText().toString());
-                mSocket.emit("onNewMessageSent", new Gson().toJson(message));
+                parentActivity.getSocket().emit("onNewMessageSent", new Gson().toJson(message));
                 messageBox.setText("");
             } else {
                 Snackbar.make(v, "Write something first!", Snackbar.LENGTH_SHORT).show();

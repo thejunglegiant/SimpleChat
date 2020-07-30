@@ -61,7 +61,7 @@ public class RoomsListFragment extends Fragment {
         RoomsListAdapter adapter = new RoomsListAdapter(new ArrayList<>());
         chatsList.setAdapter(adapter);
 
-        RoomListVMFactory factory = new RoomListVMFactory(parentActivity.app);
+        RoomListVMFactory factory = new RoomListVMFactory(parentActivity.getSocket());
         RoomsListViewModel viewModel = new ViewModelProvider(this, factory).get(RoomsListViewModel.class);
 
         viewModel.availableRooms.observe(getViewLifecycleOwner(), adapter::submitAll);

@@ -13,22 +13,20 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.github.nkzawa.emitter.Emitter;
+import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
-import com.oleksii.simplechat.authentication.SplashScreenActivity;
+import com.google.gson.Gson;
 import com.oleksii.simplechat.customviews.LogoView;
 import com.oleksii.simplechat.objects.User;
 import com.oleksii.simplechat.utils.Constants;
-import com.oleksii.simplechat.utils.IRest;
 
-import java.sql.Timestamp;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
+import java.net.URISyntaxException;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -36,9 +34,14 @@ public class MainActivity extends AppCompatActivity
     private static final String TAG = "MainActivity";
     private static String name, surname;
     public NavigationView navigationView;
-    public ChatApplication app;
     private DrawerLayout mDrawerLayout;
-    private IRest IRest;
+    private Socket mSocket; {
+        try {
+            mSocket = IO.socket(Constants.CHAT_SERVER_URL);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,18 +51,50 @@ public class MainActivity extends AppCompatActivity
         name = getIntent().getStringExtra("name");
         surname = getIntent().getStringExtra("surname");
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(Constants.CHAT_SERVER_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        IRest = retrofit.create(IRest.class);
-        app = (ChatApplication) this.getApplication();
-
         mDrawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+    }
 
-        loginUser();
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mSocket.connect();
+        if (!mSocket.connected()) {
+            // TODO Connection StatusBar
+        }
+        mSocket.emit("sync", new Gson()
+                .toJson(new User(FirebaseAuth.getInstance().getUid(), name, surname)));
+        mSocket.on("synced", synced);
+        mSocket.on("reconnect", onReconnectEvent);
+    }
+
+    private Emitter.Listener synced = new Emitter.Listener() {
+        @Override
+        public void call(Object... args) {
+            JSONObject data = (JSONObject) args[0];
+            try {
+                name = data.getString("firstname");
+                surname = data.getString("lastname");
+                runOnUiThread(MainActivity.this::setNames);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    };
+
+    private Emitter.Listener onReconnectEvent = args -> {
+        mSocket.emit("sync", new Gson()
+                .toJson(new User(FirebaseAuth.getInstance().getUid(), name, surname)));
+    };
+
+    private void setNames() {
+        View headerView = navigationView.getHeaderView(0);
+        TextView textView = headerView.findViewById(R.id.user_name);
+        LogoView logoView = headerView.findViewById(R.id.user_logo);
+        String str = name + " " + surname;
+        logoView.addText(str);
+        textView.setText(str);
     }
 
     public void toggleDrawer() {
@@ -68,42 +103,6 @@ public class MainActivity extends AppCompatActivity
         } else {
             mDrawerLayout.closeDrawer(GravityCompat.START);
         }
-    }
-
-    private void loginUser() {
-        User user = new User(FirebaseAuth.getInstance().getCurrentUser().getUid(),
-                name, surname, new Timestamp(System.currentTimeMillis()));
-
-        Call<User> call = IRest.registerUser(user);
-        call.enqueue(new Callback<User>() {
-            @Override
-            public void onResponse(@NonNull Call<User> call, @NonNull Response<User> response) {
-                if (!response.isSuccessful()) {
-                    Log.e(TAG, "Code: " + response.code());
-                    Intent intent = new Intent(getApplicationContext(), SplashScreenActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    startActivity(intent);
-                }
-
-                User user = response.body();
-                if (user != null) {
-                    MainActivity.name = user.getFirstname();
-                    MainActivity.surname = user.getLastname();
-
-                    View headerView = navigationView.getHeaderView(0);
-                    TextView textView = headerView.findViewById(R.id.user_name);
-                    LogoView logoView = headerView.findViewById(R.id.user_logo);
-                    String str = user.getFirstname() + " " + user.getLastname();
-                    logoView.addText(str);
-                    textView.setText(str);
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<User> call, @NonNull Throwable t) {
-                Log.e(TAG, t.getMessage());
-            }
-        });
     }
 
     @Override
@@ -132,6 +131,10 @@ public class MainActivity extends AppCompatActivity
                 return false;
         }
         return true;
+    }
+
+    public Socket getSocket() {
+        return this.mSocket;
     }
 
     public String getName() {

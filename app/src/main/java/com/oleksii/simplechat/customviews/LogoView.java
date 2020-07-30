@@ -22,10 +22,8 @@ import java.util.Random;
 public class LogoView extends View {
 
     private final float TEXT_SIZE_COEFFICIENT = 0.43f;
-    private final String alphabet = "abcdefghijklnmopqrstuvwxyz";
     private final int[] colors = getResources().getIntArray(R.array.userLogoColors);
 
-    private int mCircleColor;
     private Paint mCirclePaint;
     private Paint mTextPaint;
     private Bitmap bitmap;
@@ -66,8 +64,6 @@ public class LogoView extends View {
 
         TypedArray arr = getContext().obtainStyledAttributes(set, R.styleable.LogoView);
 
-        mCircleColor = arr.getColor(R.styleable.LogoView_circle_color,
-                colors[new Random().nextInt(colors.length)]);
         if (arr.getText(R.styleable.LogoView_android_text) != null)
             mTextLogo = arr.getText(R.styleable.LogoView_android_text).toString();
 
@@ -91,9 +87,23 @@ public class LogoView extends View {
 
     public void addText(String text) {
         mTextLogo = text;
-        mCirclePaint.setColor(colors[alphabet.indexOf(String.valueOf(text.charAt(0)).toLowerCase()) % 6]);
+        String alphabet = "abcdefghijklnmopqrstuvwxyz";
+        mCirclePaint.setColor(colors[alphabet.indexOf(String.valueOf(
+                text.charAt(0)).toLowerCase()) % 6]);
 
         postInvalidate();
+    }
+
+    public void setDpHeight(float dpHeight) {
+        this.getLayoutParams().height = convertDpToPixelInt(dpHeight, getContext());
+    }
+
+    public void setDpWidth(float dpWidth) {
+        this.getLayoutParams().width = convertDpToPixelInt(dpWidth, getContext());
+    }
+
+    private int convertDpToPixelInt(float dp, Context context) {
+        return (int) (dp * (((float) context.getResources().getDisplayMetrics().densityDpi) / 160.0f));
     }
 
     @Override

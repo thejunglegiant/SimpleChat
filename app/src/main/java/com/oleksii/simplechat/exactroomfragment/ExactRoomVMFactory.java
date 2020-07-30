@@ -4,16 +4,16 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.oleksii.simplechat.ChatApplication;
+import com.github.nkzawa.socketio.client.Socket;
 
 public class ExactRoomVMFactory implements ViewModelProvider.Factory {
 
-    private ChatApplication app;
+    private Socket socket;
     private long roomId;
     private String username;
 
-    public ExactRoomVMFactory(ChatApplication app, long roomId, String username) {
-        this.app = app;
+    public ExactRoomVMFactory(Socket socket, long roomId, String username) {
+        this.socket = socket;
         this.roomId = roomId;
         this.username = username;
     }
@@ -25,6 +25,6 @@ public class ExactRoomVMFactory implements ViewModelProvider.Factory {
             throw new IllegalArgumentException("Unknown ViewModel class");
         }
 
-        return (T) new ExactRoomViewModel(app, roomId, username);
+        return (T) new ExactRoomViewModel(socket, roomId, username);
     }
 }

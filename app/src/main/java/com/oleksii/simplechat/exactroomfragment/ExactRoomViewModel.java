@@ -8,8 +8,6 @@ import androidx.lifecycle.ViewModel;
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.Socket;
 import com.google.firebase.auth.FirebaseAuth;
-import com.oleksii.simplechat.ChatApplication;
-import com.oleksii.simplechat.objects.Message;
 import com.oleksii.simplechat.objects.Message;
 import com.oleksii.simplechat.utils.Constants;
 import com.oleksii.simplechat.utils.IRest;
@@ -29,15 +27,14 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class ExactRoomViewModel extends ViewModel {
 
     private String username;
-    public Socket mSocket;
+    private Socket mSocket;
     private IRest IRest;
     private long roomId;
     private static final String TAG = "ExactRoomViewModel";
     MutableLiveData<ArrayList<Message>> messages = new MutableLiveData<>();
-    private ChatApplication app;
 
-    public ExactRoomViewModel(ChatApplication app, long roomId, String username) {
-        this.app = app;
+    public ExactRoomViewModel(Socket socket, long roomId, String username) {
+        this.mSocket = socket;
         this.roomId = roomId;
         this.username = username;
 
@@ -46,7 +43,6 @@ public class ExactRoomViewModel extends ViewModel {
 
     private void init() {
         messages.setValue(new ArrayList<>());
-        mSocket = app.getSocket();
         mSocket.on("onNewMessageReceived", onNewMessageReceived);
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(Constants.CHAT_SERVER_URL)

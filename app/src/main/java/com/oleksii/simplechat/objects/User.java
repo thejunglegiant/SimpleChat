@@ -16,7 +16,8 @@ public class User {
     @SerializedName("last_session")
     private Timestamp lastSession;
 
-    public User(String firstname, String lastname) {
+    public User(String userId, String firstname, String lastname) {
+        this.userId = userId;
         this.firstname = firstname;
         this.lastname = lastname;
     }

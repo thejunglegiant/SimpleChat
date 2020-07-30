@@ -5,7 +5,9 @@ import android.util.Log;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.github.nkzawa.socketio.client.Socket;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.gson.Gson;
 import com.oleksii.simplechat.objects.NewRoom;
 import com.oleksii.simplechat.objects.User;
 import com.oleksii.simplechat.utils.Constants;
@@ -21,12 +23,13 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class NewGroupViewModel extends ViewModel {
 
-    private static final String TAG = "NewGroupViewModel";
-    private IRest userRest;
+    private final String TAG = this.getClass().getName();
+    private Socket mSocket;
     public MutableLiveData<ArrayList<User>> availableUsers = new MutableLiveData<>();
     public MutableLiveData<ArrayList<User>> checkedUsers = new MutableLiveData<>();
 
-    public NewGroupViewModel() {
+    public NewGroupViewModel(Socket socket) {
+        this.mSocket = socket;
         checkedUsers.setValue(new ArrayList<>());
     }
 
@@ -36,7 +39,7 @@ public class NewGroupViewModel extends ViewModel {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
-        userRest = retrofit.create(IRest.class);
+        IRest userRest = retrofit.create(IRest.class);
         Call<ArrayList<User>> call = userRest.getAvailableUsers(
                 FirebaseAuth.getInstance().getUid() + "/getUsers");
 
@@ -75,23 +78,8 @@ public class NewGroupViewModel extends ViewModel {
     }
 
     protected void createNewGroup(String title) {
-        Call<ArrayList<NewRoom>> call = userRest.createNewGroup(
-                FirebaseAuth.getInstance().getUid() + "/createGroup",
-                new NewRoom(title, checkedUsers.getValue()));
-
-        call.enqueue(new Callback<ArrayList<NewRoom>>() {
-            @Override
-            public void onResponse(Call<ArrayList<NewRoom>> call, Response<ArrayList<NewRoom>> response) {
-                if (!response.isSuccessful()) {
-                    Log.e(TAG, "Something went wrong with creating new group request!");
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ArrayList<NewRoom>> call, Throwable t) {
-                Log.e(TAG, t.getMessage());
-            }
-        });
+        mSocket.emit("onNewGroupCreated", new Gson()
+                .toJson(new NewRoom(title, checkedUsers.getValue())));
     }
 
     protected void clear() {

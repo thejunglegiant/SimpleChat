@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel;
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.Socket;
 import com.google.firebase.auth.FirebaseAuth;
-import com.oleksii.simplechat.ChatApplication;
 import com.oleksii.simplechat.objects.ListRoom;
 import com.oleksii.simplechat.utils.Constants;
 import com.oleksii.simplechat.utils.IRest;
@@ -21,23 +20,28 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RoomsListViewModel extends ViewModel {
 
-    public Socket mSocket;
+    private Socket mSocket;
     private IRest IRest;
     private static final String TAG = "RoomsListViewModel";
-    private ChatApplication app;
     public final MutableLiveData<ArrayList<ListRoom>> availableRooms = new MutableLiveData<>();
 
-    public RoomsListViewModel(ChatApplication app) {
+    public RoomsListViewModel(Socket socket) {
         availableRooms.setValue(new ArrayList<>());
-        this.app = app;
+        this.mSocket = socket;
 
         init();
     }
 
     private void init() {
         availableRooms.setValue(new ArrayList<>());
-        mSocket = app.getSocket();
-        mSocket.on("register", onSomething);
+
+        mSocket.on("onNewGroupAdded", onNewGroupAdded);
+        mSocket.on("onNewMessageReceived", onNewMessageReceived);
+
+        updateRoomsList();
+    }
+
+    private void updateRoomsList() {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(Constants.CHAT_SERVER_URL)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -63,13 +67,19 @@ public class RoomsListViewModel extends ViewModel {
 
             }
         });
-
     }
 
-    private Emitter.Listener onSomething = new Emitter.Listener() {
+    private Emitter.Listener onNewGroupAdded = new Emitter.Listener() {
         @Override
         public void call(Object... args) {
-//            Log.i(TAG, "works");
+            updateRoomsList();
+        }
+    };
+
+    private Emitter.Listener onNewMessageReceived = new Emitter.Listener() {
+        @Override
+        public void call(Object... args) {
+            updateRoomsList();
         }
     };
 }
