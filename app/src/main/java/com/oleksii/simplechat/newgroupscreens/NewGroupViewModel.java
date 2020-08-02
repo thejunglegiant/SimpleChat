@@ -8,8 +8,8 @@ import androidx.lifecycle.ViewModel;
 import com.github.nkzawa.socketio.client.Socket;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.gson.Gson;
-import com.oleksii.simplechat.objects.NewRoom;
-import com.oleksii.simplechat.objects.User;
+import com.oleksii.simplechat.models.NewRoom;
+import com.oleksii.simplechat.models.User;
 import com.oleksii.simplechat.utils.Constants;
 import com.oleksii.simplechat.utils.IRest;
 

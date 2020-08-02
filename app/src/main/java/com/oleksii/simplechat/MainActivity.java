@@ -6,9 +6,7 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.Navigation;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -20,7 +18,7 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.gson.Gson;
 import com.oleksii.simplechat.customviews.LogoView;
-import com.oleksii.simplechat.objects.User;
+import com.oleksii.simplechat.models.User;
 import com.oleksii.simplechat.utils.Constants;
 
 import org.json.JSONException;
@@ -66,7 +64,9 @@ public class MainActivity extends AppCompatActivity
         mSocket.emit("sync", new Gson()
                 .toJson(new User(FirebaseAuth.getInstance().getUid(), name, surname)));
         mSocket.on("synced", synced);
+        mSocket.on("connect", onConnectEvent);
         mSocket.on("reconnect", onReconnectEvent);
+        mSocket.on("disconnect", onDisconnectEvent);
     }
 
     private Emitter.Listener synced = new Emitter.Listener() {
@@ -77,6 +77,7 @@ public class MainActivity extends AppCompatActivity
                 name = data.getString("firstname");
                 surname = data.getString("lastname");
                 runOnUiThread(MainActivity.this::setNames);
+                runOnUiThread(MainActivity.this::setModeOnline);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -87,6 +88,26 @@ public class MainActivity extends AppCompatActivity
         mSocket.emit("sync", new Gson()
                 .toJson(new User(FirebaseAuth.getInstance().getUid(), name, surname)));
     };
+
+    private Emitter.Listener onDisconnectEvent = args -> {
+        runOnUiThread(MainActivity.this::setModeOffline);
+    };
+
+    private Emitter.Listener onConnectEvent = args -> {
+        runOnUiThread(MainActivity.this::setModeOnline);
+    };
+
+    private void setModeOnline() {
+        View headerView = navigationView.getHeaderView(0);
+        TextView statusText = headerView.findViewById(R.id.online_status);
+        statusText.setText(R.string.online);
+    }
+
+    private void setModeOffline() {
+        View headerView = navigationView.getHeaderView(0);
+        TextView statusText = headerView.findViewById(R.id.online_status);
+        statusText.setText(R.string.offline);
+    }
 
     private void setNames() {
         View headerView = navigationView.getHeaderView(0);

@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel;
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.Socket;
 import com.google.firebase.auth.FirebaseAuth;
-import com.oleksii.simplechat.objects.ListRoom;
+import com.oleksii.simplechat.models.ListRoom;
 import com.oleksii.simplechat.utils.Constants;
 import com.oleksii.simplechat.utils.IRest;
 

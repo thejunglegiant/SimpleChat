@@ -1,4 +1,4 @@
-package com.oleksii.simplechat.objects;
+package com.oleksii.simplechat.models;
 
 import java.util.ArrayList;
 

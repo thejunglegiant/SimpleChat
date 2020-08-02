@@ -6,7 +6,6 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -17,27 +16,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.github.nkzawa.socketio.client.Socket;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.gson.Gson;
 import com.oleksii.simplechat.MainActivity;
 import com.oleksii.simplechat.R;
 import com.oleksii.simplechat.adapters.MessagesListAdapter;
-import com.oleksii.simplechat.adapters.RoomsListAdapter;
 import com.oleksii.simplechat.customviews.LogoView;
-import com.oleksii.simplechat.objects.Message;
-import com.oleksii.simplechat.roomslistfragment.RoomListVMFactory;
-import com.oleksii.simplechat.roomslistfragment.RoomsListViewModel;
-
-import org.json.JSONObject;
+import com.oleksii.simplechat.models.Message;
 
 import java.util.ArrayList;
-
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ExactRoomFragment extends Fragment {
 

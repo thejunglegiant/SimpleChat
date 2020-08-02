@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.oleksii.simplechat.R;
 import com.oleksii.simplechat.customviews.LogoView;
-import com.oleksii.simplechat.objects.Message;
+import com.oleksii.simplechat.models.Message;
 import com.oleksii.simplechat.utils.Util;
 
 import java.util.ArrayList;

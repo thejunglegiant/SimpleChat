@@ -1,4 +1,4 @@
-package com.oleksii.simplechat.objects;
+package com.oleksii.simplechat.models;
 
 import com.google.gson.annotations.SerializedName;
 
