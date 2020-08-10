@@ -15,7 +15,7 @@ android {
 
     defaultConfig {
         applicationId "com.oleksii.simplechat"
-        minSdkVersion 25
+        minSdkVersion 23
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"
@@ -33,9 +33,6 @@ android {
 }
 
 dependencies {
-    def room_version = "2.2.5"
-    def lottieVersion = "3.4.0"
-    def nav_version = "2.3.0-beta01"
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
@@ -46,21 +43,34 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
-    implementation "androidx.room:room-runtime:$room_version"
-    annotationProcessor "androidx.room:room-compiler:$room_version"
+    def roomVersion = "2.2.5"
+    implementation "androidx.room:room-runtime:$roomVersion"
+    annotationProcessor "androidx.room:room-compiler:$roomVersion"
 
-    implementation 'com.github.nkzawa:socket.io-client:0.6.0'
+    def socketIoVersion = "0.6.0"
+    implementation "com.github.nkzawa:socket.io-client:$socketIoVersion"
 
-    implementation 'com.squareup.retrofit2:retrofit:2.8.1'
-    implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
+    def retrofitVersion = '2.9.0'
+    implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
+    implementation "com.squareup.retrofit2:converter-gson:$retrofitVersion"
 
+    def lottieVersion = "3.4.0"
     implementation "com.airbnb.android:lottie:$lottieVersion"
+
+    def navigationVersion = "2.3.0"
+    implementation "androidx.navigation:navigation-fragment:$navigationVersion"
+    implementation "androidx.navigation:navigation-ui:$navigationVersion"
+
+    // Dagger
+    def daggerVersion = "2.28.3"
+    api "com.google.dagger:dagger:$daggerVersion"
+    annotationProcessor "com.google.dagger:dagger-compiler:$daggerVersion"
+    api "com.google.dagger:dagger-android:$daggerVersion"
+    annotationProcessor "com.google.dagger:dagger-android-processor:$daggerVersion"
 
     implementation 'com.google.firebase:firebase-auth:19.3.1'
     implementation 'com.google.android.gms:play-services-auth:18.0.0'
     implementation 'com.google.firebase:firebase-messaging:20.2.3'
-    implementation "androidx.navigation:navigation-fragment:$nav_version"
-    implementation "androidx.navigation:navigation-ui:$nav_version"
 
     implementation ('com.alimuzaffar.lib:pinentryedittext:2.0.6')
 }

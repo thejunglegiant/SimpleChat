@@ -1,4 +1,4 @@
-package com.oleksii.simplechat.newgroupscreens;
+package com.oleksii.simplechat.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -20,24 +20,18 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.oleksii.simplechat.MainActivity;
+import com.oleksii.simplechat.activities.MainActivity;
 import com.oleksii.simplechat.R;
+import com.oleksii.simplechat.activities.NewGroupActivity;
 import com.oleksii.simplechat.adapters.PeopleListAdapter;
 import com.oleksii.simplechat.customviews.LogoView;
+import com.oleksii.simplechat.viewmodels.NewGroupViewModel;
 
 import java.util.ArrayList;
 
 public class FinallyCreateGroupFragment extends Fragment {
 
-    private MainActivity parentActivity;
-
     public FinallyCreateGroupFragment() { }
-
-    @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        parentActivity = (MainActivity) getActivity();
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -52,8 +46,7 @@ public class FinallyCreateGroupFragment extends Fragment {
         LogoView logoView = rootView.findViewById(R.id.room_logo);
         TextView membersText = rootView.findViewById(R.id.members);
 
-        NewGroupVMFactory factory = new NewGroupVMFactory(parentActivity.getSocket());
-        NewGroupViewModel viewModel = new ViewModelProvider(requireActivity(), factory)
+        NewGroupViewModel viewModel = new ViewModelProvider(requireActivity())
                 .get(NewGroupViewModel.class);
 
         RecyclerView recyclerView = rootView.findViewById(R.id.users_list);
@@ -83,9 +76,7 @@ public class FinallyCreateGroupFragment extends Fragment {
         rootView.findViewById(R.id.fab).setOnClickListener(v -> {
             if (!groupNameText.getText().toString().trim().isEmpty()) {
                 viewModel.createNewGroup(groupNameText.getText().toString().trim());
-                viewModel.clear();
-                Navigation.findNavController(v)
-                        .navigate(R.id.action_finallyCreateGroupFragment_to_chatsListFragment);
+                requireActivity().finish();
             } else {
                 Toast.makeText(getContext(), getString(R.string.enter_group_name_first),
                         Toast.LENGTH_SHORT).show();

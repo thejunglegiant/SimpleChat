@@ -1,4 +1,4 @@
-package com.oleksii.simplechat.authentication;
+package com.oleksii.simplechat.fragments;
 
 import android.os.Bundle;
 

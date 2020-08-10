@@ -1,4 +1,4 @@
-package com.oleksii.simplechat.otherscreens;
+package com.oleksii.simplechat.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;

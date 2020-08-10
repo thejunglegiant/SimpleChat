@@ -1,4 +1,4 @@
-package com.oleksii.simplechat.authentication;
+package com.oleksii.simplechat.fragments;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -6,7 +6,6 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -22,7 +21,8 @@ import com.google.firebase.FirebaseException;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
-import com.oleksii.simplechat.MainActivity;
+import com.oleksii.simplechat.activities.AskNameActivity;
+import com.oleksii.simplechat.activities.MainActivity;
 import com.oleksii.simplechat.R;
 import com.oleksii.simplechat.customviews.PhoneNumberEditText;
 

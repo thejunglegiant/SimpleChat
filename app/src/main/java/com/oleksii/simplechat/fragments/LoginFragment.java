@@ -1,11 +1,10 @@
-package com.oleksii.simplechat.authentication;
+package com.oleksii.simplechat.fragments;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.navigation.Navigation;
 
 import android.util.Log;
@@ -15,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 
 import com.oleksii.simplechat.R;
+import com.oleksii.simplechat.activities.GoogleSignInActivity;
 
 public class LoginFragment extends Fragment implements View.OnClickListener {
 

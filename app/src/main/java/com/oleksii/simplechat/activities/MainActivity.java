@@ -1,4 +1,4 @@
-package com.oleksii.simplechat;
+package com.oleksii.simplechat.activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -6,45 +6,44 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.Navigation;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
 import com.github.nkzawa.emitter.Emitter;
-import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.gson.Gson;
+import com.oleksii.simplechat.R;
 import com.oleksii.simplechat.customviews.LogoView;
+import com.oleksii.simplechat.di.AppComponent;
+import com.oleksii.simplechat.di.DaggerAppComponent;
 import com.oleksii.simplechat.models.User;
-import com.oleksii.simplechat.utils.Constants;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.net.URISyntaxException;
+import javax.inject.Inject;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    private static final String TAG = "MainActivity";
+    private static final String TAG = MainActivity.class.getName();
     private static String name, surname;
     public NavigationView navigationView;
     private DrawerLayout mDrawerLayout;
-    private Socket mSocket; {
-        try {
-            mSocket = IO.socket(Constants.CHAT_SERVER_URL);
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
-    }
+    @Inject Socket mSocket;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        AppComponent appComponent = DaggerAppComponent.create();
+        appComponent.inject(this);
 
         name = getIntent().getStringExtra("name");
         surname = getIntent().getStringExtra("surname");
@@ -57,7 +56,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onStart() {
         super.onStart();
-        mSocket.connect();
         if (!mSocket.connected()) {
             // TODO Connection StatusBar
         }
@@ -130,8 +128,9 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
         switch (menuItem.getItemId()) {
             case R.id.new_group:
-                Navigation.findNavController(this, R.id.fragments_container)
-                        .navigate(R.id.action_chatsListFragment_to_newGroupFragment);
+                Intent intent = new Intent(this, NewGroupActivity.class);
+                startActivity(intent);
+                overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left);
                 toggleDrawer();
                 break;
             case R.id.saved_messages:
@@ -152,10 +151,6 @@ public class MainActivity extends AppCompatActivity
                 return false;
         }
         return true;
-    }
-
-    public Socket getSocket() {
-        return this.mSocket;
     }
 
     public String getName() {

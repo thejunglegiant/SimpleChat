@@ -1,9 +1,7 @@
-package com.oleksii.simplechat.newgroupscreens;
+package com.oleksii.simplechat.fragments;
 
-import android.content.Context;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -16,24 +14,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.oleksii.simplechat.MainActivity;
 import com.oleksii.simplechat.R;
 import com.oleksii.simplechat.adapters.PeopleListAdapter;
+import com.oleksii.simplechat.viewmodels.NewGroupViewModel;
 
 import java.util.ArrayList;
 
 public class NewGroupFragment extends Fragment {
 
-    private static final String TAG = "NewGroupFragment";
-    private MainActivity parentActivity;
+    private static final String TAG = NewGroupFragment.class.getName();
 
     public NewGroupFragment() { }
-
-    @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        parentActivity = (MainActivity) getActivity();
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -41,13 +32,13 @@ public class NewGroupFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_new_group, container, false);
 
         Toolbar toolbar = rootView.findViewById(R.id.toolbar);
-        toolbar.setNavigationOnClickListener(v -> Navigation.findNavController(v)
-                .navigate(R.id.action_newGroupFragment_to_chatsListFragment));
+        toolbar.setNavigationOnClickListener(v -> {
+            requireActivity().finish();
+            requireActivity().overridePendingTransition(R.anim.enter_from_left, R.anim.exit_to_right);
+        });
 
-        NewGroupVMFactory factory = new NewGroupVMFactory(parentActivity.getSocket());
-        NewGroupViewModel viewModel = new ViewModelProvider(requireActivity(), factory)
+        NewGroupViewModel viewModel = new ViewModelProvider(requireActivity())
                 .get(NewGroupViewModel.class);
-        viewModel.init();
 
         RecyclerView recyclerView = rootView.findViewById(R.id.available_people_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -59,7 +50,7 @@ public class NewGroupFragment extends Fragment {
                 Navigation.findNavController(v)
                         .navigate(R.id.action_newGroupFragment_to_finallyCreateGroupFragment);
             else
-                Toast.makeText(getContext(), getString(R.string.need_to_add_at_least_2_users),
+                Toast.makeText(getContext(), getString(R.string.need_to_add_at_least_1_users),
                         Toast.LENGTH_SHORT).show();
         });
 

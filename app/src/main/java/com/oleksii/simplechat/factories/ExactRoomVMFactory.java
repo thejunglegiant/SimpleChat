@@ -1,19 +1,18 @@
-package com.oleksii.simplechat.exactroomfragment;
+package com.oleksii.simplechat.factories;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.github.nkzawa.socketio.client.Socket;
+import com.oleksii.simplechat.viewmodels.ExactRoomViewModel;
 
 public class ExactRoomVMFactory implements ViewModelProvider.Factory {
 
-    private Socket socket;
     private long roomId;
     private String username;
 
-    public ExactRoomVMFactory(Socket socket, long roomId, String username) {
-        this.socket = socket;
+    public ExactRoomVMFactory(long roomId, String username) {
         this.roomId = roomId;
         this.username = username;
     }
@@ -25,6 +24,6 @@ public class ExactRoomVMFactory implements ViewModelProvider.Factory {
             throw new IllegalArgumentException("Unknown ViewModel class");
         }
 
-        return (T) new ExactRoomViewModel(socket, roomId, username);
+        return (T) new ExactRoomViewModel(roomId, username);
     }
 }

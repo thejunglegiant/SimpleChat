@@ -1,4 +1,4 @@
-package com.oleksii.simplechat.authentication;
+package com.oleksii.simplechat.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -13,7 +13,7 @@ import android.widget.Toast;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.oleksii.simplechat.MainActivity;
+import com.oleksii.simplechat.activities.MainActivity;
 import com.oleksii.simplechat.R;
 
 public class AskNameActivity extends AppCompatActivity {

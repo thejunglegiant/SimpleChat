@@ -1,4 +1,4 @@
-package com.oleksii.simplechat.roomslistfragment;
+package com.oleksii.simplechat.viewmodels;
 
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -6,28 +6,32 @@ import androidx.lifecycle.ViewModel;
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.Socket;
 import com.google.firebase.auth.FirebaseAuth;
+import com.oleksii.simplechat.di.AppComponent;
+import com.oleksii.simplechat.di.DaggerAppComponent;
 import com.oleksii.simplechat.models.ListRoom;
-import com.oleksii.simplechat.utils.Constants;
 import com.oleksii.simplechat.utils.IRest;
 
 import java.util.ArrayList;
+
+import javax.inject.Inject;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RoomsListViewModel extends ViewModel {
 
-    private Socket mSocket;
-    private IRest IRest;
-    private static final String TAG = "RoomsListViewModel";
+    private static final String TAG = RoomsListViewModel.class.getName();
     public final MutableLiveData<ArrayList<ListRoom>> availableRooms = new MutableLiveData<>();
+    @Inject Retrofit retrofit;
+    @Inject Socket mSocket;
 
-    public RoomsListViewModel(Socket socket) {
+    public RoomsListViewModel() {
         availableRooms.setValue(new ArrayList<>());
-        this.mSocket = socket;
+
+        AppComponent appComponent = DaggerAppComponent.create();
+        appComponent.inject(this);
 
         init();
     }
@@ -35,19 +39,17 @@ public class RoomsListViewModel extends ViewModel {
     private void init() {
         availableRooms.setValue(new ArrayList<>());
 
-        mSocket.on("onNewGroupAdded", onNewGroupAdded);
-        mSocket.on("onNewMessageReceived", onNewMessageReceived);
+        AppComponent appComponent = DaggerAppComponent.create();
+        appComponent.inject(this);
+
+        mSocket.on("onNewGroupAdded", onInfoChanged);
+        mSocket.on("onNewMessageReceived", onInfoChanged);
 
         updateRoomsList();
     }
 
     private void updateRoomsList() {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(Constants.CHAT_SERVER_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        IRest = retrofit.create(IRest.class);
+        IRest IRest = retrofit.create(com.oleksii.simplechat.utils.IRest.class);
         Call<ArrayList<ListRoom>> call = IRest.getAvailableRooms(
                 FirebaseAuth.getInstance().getUid() + "/getRooms");
 
@@ -69,14 +71,7 @@ public class RoomsListViewModel extends ViewModel {
         });
     }
 
-    private Emitter.Listener onNewGroupAdded = new Emitter.Listener() {
-        @Override
-        public void call(Object... args) {
-            updateRoomsList();
-        }
-    };
-
-    private Emitter.Listener onNewMessageReceived = new Emitter.Listener() {
+    private Emitter.Listener onInfoChanged = new Emitter.Listener() {
         @Override
         public void call(Object... args) {
             updateRoomsList();

@@ -1,4 +1,4 @@
-package com.oleksii.simplechat.exactroomfragment;
+package com.oleksii.simplechat.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -19,13 +19,12 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.google.android.material.snackbar.Snackbar;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.gson.Gson;
-import com.oleksii.simplechat.MainActivity;
+import com.oleksii.simplechat.activities.MainActivity;
 import com.oleksii.simplechat.R;
 import com.oleksii.simplechat.adapters.MessagesListAdapter;
 import com.oleksii.simplechat.customviews.LogoView;
-import com.oleksii.simplechat.models.Message;
+import com.oleksii.simplechat.factories.ExactRoomVMFactory;
+import com.oleksii.simplechat.viewmodels.ExactRoomViewModel;
 
 import java.util.ArrayList;
 
@@ -76,7 +75,7 @@ public class ExactRoomFragment extends Fragment {
         MessagesListAdapter adapter = new MessagesListAdapter(new ArrayList<>(), getContext());
         messagesList.setAdapter(adapter);
 
-        ExactRoomVMFactory factory = new ExactRoomVMFactory(parentActivity.getSocket(), roomId, parentActivity.getName());
+        ExactRoomVMFactory factory = new ExactRoomVMFactory(roomId, parentActivity.getName());
         ExactRoomViewModel viewModel = new ViewModelProvider(this, factory).get(ExactRoomViewModel.class);
         viewModel.messages.observe(getViewLifecycleOwner(), list -> {
             adapter.submitAll(list);
@@ -85,10 +84,9 @@ public class ExactRoomFragment extends Fragment {
 
         Button sendButton = rootView.findViewById(R.id.send_button);
         sendButton.setOnClickListener(v -> {
-            if (!messageBox.getText().toString().trim().isEmpty()) {
-                Message message = new Message(FirebaseAuth.getInstance().getUid(),
-                        roomId, messageBox.getText().toString());
-                parentActivity.getSocket().emit("onNewMessageSent", new Gson().toJson(message));
+            String message = messageBox.getText().toString().trim();
+            if (!message.isEmpty()) {
+                viewModel.sendMessage(message);
                 messageBox.setText("");
             } else {
                 Snackbar.make(v, "Write something first!", Snackbar.LENGTH_SHORT).show();

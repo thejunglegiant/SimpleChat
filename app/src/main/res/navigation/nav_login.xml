@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/startMessagingFragment"
-        android:name="com.oleksii.simplechat.authentication.StartMessagingFragment"
+        android:name="com.oleksii.simplechat.fragments.StartMessagingFragment"
         android:label="fragment_start_messaging"
         tools:layout="@layout/fragment_start_messaging" >
         <action
@@ -20,7 +20,7 @@
     </fragment>
     <fragment
         android:id="@+id/loginFragment"
-        android:name="com.oleksii.simplechat.authentication.LoginFragment"
+        android:name="com.oleksii.simplechat.fragments.LoginFragment"
         android:label="fragment_login"
         tools:layout="@layout/fragment_login" >
         <action
@@ -33,7 +33,7 @@
     </fragment>
     <fragment
         android:id="@+id/enterPhoneNumberFragment"
-        android:name="com.oleksii.simplechat.authentication.EnterPhoneNumberFragment"
+        android:name="com.oleksii.simplechat.fragments.EnterPhoneNumberFragment"
         android:label="fragment_enter_phone_number"
         tools:layout="@layout/fragment_enter_phone_number"
         app:startDestination="@id/action_enterPhoneNumberFragment_to_verifyPhoneNumberFragment">
@@ -54,7 +54,7 @@
     </fragment>
     <fragment
         android:id="@+id/verifyPhoneNumberFragment"
-        android:name="com.oleksii.simplechat.authentication.VerifyPhoneNumberFragment"
+        android:name="com.oleksii.simplechat.fragments.VerifyPhoneNumberFragment"
         android:label="fragment_verify_phone_number"
         tools:layout="@layout/fragment_verify_phone_number">
         <action

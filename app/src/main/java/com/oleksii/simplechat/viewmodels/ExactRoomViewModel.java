@@ -1,4 +1,4 @@
-package com.oleksii.simplechat.exactroomfragment;
+package com.oleksii.simplechat.viewmodels;
 
 import android.util.Log;
 
@@ -8,6 +8,9 @@ import androidx.lifecycle.ViewModel;
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.Socket;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.gson.Gson;
+import com.oleksii.simplechat.di.AppComponent;
+import com.oleksii.simplechat.di.DaggerAppComponent;
 import com.oleksii.simplechat.models.Message;
 import com.oleksii.simplechat.utils.Constants;
 import com.oleksii.simplechat.utils.IRest;
@@ -18,6 +21,8 @@ import org.json.JSONObject;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 
+import javax.inject.Inject;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -26,17 +31,19 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ExactRoomViewModel extends ViewModel {
 
-    private String username;
-    private Socket mSocket;
-    private IRest IRest;
-    private long roomId;
     private static final String TAG = "ExactRoomViewModel";
-    MutableLiveData<ArrayList<Message>> messages = new MutableLiveData<>();
+    public MutableLiveData<ArrayList<Message>> messages = new MutableLiveData<>();
+    private long roomId;
+    private String username;
+    @Inject Socket mSocket;
+    @Inject Retrofit retrofit;
 
-    public ExactRoomViewModel(Socket socket, long roomId, String username) {
-        this.mSocket = socket;
+    public ExactRoomViewModel(long roomId, String username) {
         this.roomId = roomId;
         this.username = username;
+
+        AppComponent appComponent = DaggerAppComponent.create();
+        appComponent.inject(this);
 
         init();
     }
@@ -44,12 +51,8 @@ public class ExactRoomViewModel extends ViewModel {
     private void init() {
         messages.setValue(new ArrayList<>());
         mSocket.on("onNewMessageReceived", onNewMessageReceived);
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(Constants.CHAT_SERVER_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
 
-        IRest = retrofit.create(IRest.class);
+        IRest IRest = retrofit.create(com.oleksii.simplechat.utils.IRest.class);
         Call<ArrayList<Message>> call = IRest.getAllRoomMessages(
                 FirebaseAuth.getInstance().getUid() + "/" + roomId + "/getMessages"
         );
@@ -74,7 +77,7 @@ public class ExactRoomViewModel extends ViewModel {
         try {
             if (data.getInt("roomId") == roomId) {
                 Message message = new Message(data.getString("firstname").equals(this.username),
-                        data.getString("firstname"), data.getString("body"),
+                        data.getString("firstname"), data.getString("lastname"), data.getString("body"),
                         new Timestamp(data.getLong("stime")));
                 this.addMessage(message);
             }
@@ -87,5 +90,11 @@ public class ExactRoomViewModel extends ViewModel {
         ArrayList<Message> tmp = messages.getValue();
         tmp.add(message);
         messages.postValue(tmp);
+    }
+
+    public void sendMessage(String message) {
+        Message newMessage = new Message(FirebaseAuth.getInstance().getUid(),
+                roomId, message);
+        mSocket.emit("onNewMessageSent", new Gson().toJson(newMessage));
     }
 }

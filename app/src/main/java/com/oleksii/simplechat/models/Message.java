@@ -22,17 +22,18 @@ public class Message {
         this.body = body;
     }
 
-    public Message(boolean isSender, String firstname, String body, Timestamp stime) {
-        this.isSender = isSender;
-        this.firstname = firstname;
-        this.body = body;
-        this.sendingTime = stime;
-    }
-
     public Message(String firstname, String body, Timestamp sendingTime) {
         this.firstname = firstname;
         this.body = body;
         this.sendingTime = sendingTime;
+    }
+
+    public Message(boolean isSender, String firstname, String lastname, String body, Timestamp stime) {
+        this.isSender = isSender;
+        this.firstname = firstname;
+        this.lastname = lastname;
+        this.body = body;
+        this.sendingTime = stime;
     }
 
     public String getUserId() {

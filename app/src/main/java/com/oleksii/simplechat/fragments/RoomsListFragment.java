@@ -1,4 +1,4 @@
-package com.oleksii.simplechat.roomslistfragment;
+package com.oleksii.simplechat.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -16,15 +16,16 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.oleksii.simplechat.MainActivity;
+import com.oleksii.simplechat.activities.MainActivity;
 import com.oleksii.simplechat.R;
 import com.oleksii.simplechat.adapters.RoomsListAdapter;
+import com.oleksii.simplechat.viewmodels.RoomsListViewModel;
 
 import java.util.ArrayList;
 
 public class RoomsListFragment extends Fragment {
 
-    private static final String TAG = "RoomsListFragment";
+    private static final String TAG = RoomsListFragment.class.getName();
     private MainActivity parentActivity;
 
     public RoomsListFragment() { }
@@ -61,13 +62,9 @@ public class RoomsListFragment extends Fragment {
         RoomsListAdapter adapter = new RoomsListAdapter(new ArrayList<>());
         chatsList.setAdapter(adapter);
 
-        RoomListVMFactory factory = new RoomListVMFactory(parentActivity.getSocket());
-        RoomsListViewModel viewModel = new ViewModelProvider(this, factory).get(RoomsListViewModel.class);
+        RoomsListViewModel viewModel = new ViewModelProvider(this).get(RoomsListViewModel.class);
 
         viewModel.availableRooms.observe(getViewLifecycleOwner(), adapter::submitAll);
-
-//        Navigation.findNavController(getActivity(), R.id.fragments_container)
-//                .navigate(R.id.action_chatsListFragment_to_newGroupFragment);
 
         return rootView;
     }

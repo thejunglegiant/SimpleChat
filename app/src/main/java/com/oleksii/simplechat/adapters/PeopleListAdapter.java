@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.oleksii.simplechat.R;
 import com.oleksii.simplechat.customviews.LogoView;
-import com.oleksii.simplechat.newgroupscreens.NewGroupViewModel;
+import com.oleksii.simplechat.viewmodels.NewGroupViewModel;
 import com.oleksii.simplechat.models.User;
 import com.oleksii.simplechat.utils.Util;
 

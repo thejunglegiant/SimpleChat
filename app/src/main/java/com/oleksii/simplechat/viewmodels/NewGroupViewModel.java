@@ -1,4 +1,4 @@
-package com.oleksii.simplechat.newgroupscreens;
+package com.oleksii.simplechat.viewmodels;
 
 import android.util.Log;
 
@@ -8,37 +8,39 @@ import androidx.lifecycle.ViewModel;
 import com.github.nkzawa.socketio.client.Socket;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.gson.Gson;
+import com.oleksii.simplechat.di.AppComponent;
+import com.oleksii.simplechat.di.DaggerAppComponent;
 import com.oleksii.simplechat.models.NewRoom;
 import com.oleksii.simplechat.models.User;
-import com.oleksii.simplechat.utils.Constants;
 import com.oleksii.simplechat.utils.IRest;
 
 import java.util.ArrayList;
+
+import javax.inject.Inject;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class NewGroupViewModel extends ViewModel {
 
     private final String TAG = this.getClass().getName();
-    private Socket mSocket;
+    @Inject Socket mSocket;
+    @Inject Retrofit retrofit;
     public MutableLiveData<ArrayList<User>> availableUsers = new MutableLiveData<>();
     public MutableLiveData<ArrayList<User>> checkedUsers = new MutableLiveData<>();
 
-    public NewGroupViewModel(Socket socket) {
-        this.mSocket = socket;
+    public NewGroupViewModel() {
         checkedUsers.setValue(new ArrayList<>());
+
+        AppComponent appComponent = DaggerAppComponent.create();
+        appComponent.inject(this);
+
+        init();
     }
 
-    protected void init() {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(Constants.CHAT_SERVER_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
+    private void init() {
         IRest userRest = retrofit.create(IRest.class);
         Call<ArrayList<User>> call = userRest.getAvailableUsers(
                 FirebaseAuth.getInstance().getUid() + "/getUsers");
@@ -77,14 +79,8 @@ public class NewGroupViewModel extends ViewModel {
         return checkedUsers.getValue();
     }
 
-    protected void createNewGroup(String title) {
+    public void createNewGroup(String title) {
         mSocket.emit("onNewGroupCreated", new Gson()
                 .toJson(new NewRoom(title, checkedUsers.getValue())));
     }
-
-    protected void clear() {
-        this.availableUsers.setValue(new ArrayList<>());
-        this.checkedUsers.setValue(new ArrayList<>());
-    }
-
 }

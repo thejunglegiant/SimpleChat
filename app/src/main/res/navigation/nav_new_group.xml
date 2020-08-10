@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_new_group.xml"
+    app:startDestination="@id/newGroupFragment">
+
+    <fragment
+        android:id="@+id/newGroupFragment"
+        android:name="com.oleksii.simplechat.fragments.NewGroupFragment"
+        android:label="NewGroupFragment"
+        tools:layout="@layout/fragment_new_group">
+        <action
+            android:id="@+id/action_newGroupFragment_to_finallyCreateGroupFragment"
+            app:destination="@id/finallyCreateGroupFragment"
+            app:enterAnim="@anim/enter_from_right"
+            app:exitAnim="@anim/exit_to_left"
+            app:popEnterAnim="@anim/enter_from_left"
+            app:popExitAnim="@anim/exit_to_right" />
+    </fragment>
+    <fragment
+        android:id="@+id/finallyCreateGroupFragment"
+        android:name="com.oleksii.simplechat.fragments.FinallyCreateGroupFragment"
+        android:label="fragment_finally_create_group"
+        tools:layout="@layout/fragment_finally_create_group" >
+        <action
+            android:id="@+id/action_finallyCreateGroupFragment_to_newGroupFragment"
+            app:destination="@id/newGroupFragment"
+            app:enterAnim="@anim/enter_from_left"
+            app:exitAnim="@anim/exit_to_right"
+            app:popEnterAnim="@anim/enter_from_right"
+            app:popExitAnim="@anim/exit_to_left" />
+    </fragment>
+</navigation>

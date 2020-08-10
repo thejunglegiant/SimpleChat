@@ -1,4 +1,4 @@
-package com.oleksii.simplechat.authentication;
+package com.oleksii.simplechat.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 

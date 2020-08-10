@@ -7,19 +7,12 @@
 
     <fragment
         android:id="@+id/roomsListFragment"
-        android:name="com.oleksii.simplechat.roomslistfragment.RoomsListFragment"
+        android:name="com.oleksii.simplechat.fragments.RoomsListFragment"
         android:label="fragment_chats_list"
         tools:layout="@layout/fragment_rooms_list" >
         <action
             android:id="@+id/action_chatsListFragment_to_inviteFriendsFragment"
             app:destination="@id/inviteFriendsFragment"
-            app:enterAnim="@anim/enter_from_right"
-            app:exitAnim="@anim/exit_to_left"
-            app:popEnterAnim="@anim/enter_from_left"
-            app:popExitAnim="@anim/exit_to_right" />
-        <action
-            android:id="@+id/action_chatsListFragment_to_newGroupFragment"
-            app:destination="@id/newGroupFragment"
             app:enterAnim="@anim/enter_from_right"
             app:exitAnim="@anim/exit_to_left"
             app:popEnterAnim="@anim/enter_from_left"
@@ -34,7 +27,7 @@
     </fragment>
     <fragment
         android:id="@+id/inviteFriendsFragment"
-        android:name="com.oleksii.simplechat.otherscreens.InviteFriendsFragment"
+        android:name="com.oleksii.simplechat.fragments.InviteFriendsFragment"
         android:label="fragment_invite_friends"
         tools:layout="@layout/fragment_invite_friends" >
         <action
@@ -46,50 +39,8 @@
             app:popExitAnim="@anim/exit_to_left" />
     </fragment>
     <fragment
-        android:id="@+id/finallyCreateGroupFragment"
-        android:name="com.oleksii.simplechat.newgroupscreens.FinallyCreateGroupFragment"
-        android:label="fragment_finally_create_group"
-        tools:layout="@layout/fragment_finally_create_group" >
-        <action
-            android:id="@+id/action_finallyCreateGroupFragment_to_newGroupFragment"
-            app:destination="@id/newGroupFragment"
-            app:enterAnim="@anim/enter_from_left"
-            app:exitAnim="@anim/exit_to_right"
-            app:popEnterAnim="@anim/enter_from_right"
-            app:popExitAnim="@anim/exit_to_left" />
-        <action
-            android:id="@+id/action_finallyCreateGroupFragment_to_chatsListFragment"
-            app:destination="@id/roomsListFragment"
-            app:popUpTo="@+id/roomsListFragment"
-            app:popUpToInclusive="true"
-            app:enterAnim="@anim/enter_from_right"
-            app:exitAnim="@anim/exit_to_left"
-            app:popEnterAnim="@anim/enter_from_left"
-            app:popExitAnim="@anim/exit_to_right" />
-    </fragment>
-    <fragment
-        android:id="@+id/newGroupFragment"
-        android:name="com.oleksii.simplechat.newgroupscreens.NewGroupFragment"
-        android:label="NewGroupFragment"
-        tools:layout="@layout/fragment_new_group">
-        <action
-            android:id="@+id/action_newGroupFragment_to_chatsListFragment"
-            app:destination="@id/roomsListFragment"
-            app:enterAnim="@anim/enter_from_left"
-            app:exitAnim="@anim/exit_to_right"
-            app:popEnterAnim="@anim/enter_from_right"
-            app:popExitAnim="@anim/exit_to_left" />
-        <action
-            android:id="@+id/action_newGroupFragment_to_finallyCreateGroupFragment"
-            app:destination="@id/finallyCreateGroupFragment"
-            app:enterAnim="@anim/enter_from_right"
-            app:exitAnim="@anim/exit_to_left"
-            app:popEnterAnim="@anim/enter_from_left"
-            app:popExitAnim="@anim/exit_to_right" />
-    </fragment>
-    <fragment
         android:id="@+id/exactRoomFragment"
-        android:name="com.oleksii.simplechat.exactroomfragment.ExactRoomFragment"
+        android:name="com.oleksii.simplechat.fragments.ExactRoomFragment"
         android:label="fragment_exact_room"
         tools:layout="@layout/fragment_exact_room" >
         <action
