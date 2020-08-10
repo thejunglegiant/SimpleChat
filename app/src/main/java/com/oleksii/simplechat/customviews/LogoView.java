@@ -87,9 +87,7 @@ public class LogoView extends View {
 
     public void addText(String text) {
         mTextLogo = text;
-        String alphabet = "abcdefghijklnmopqrstuvwxyz";
-        mCirclePaint.setColor(colors[alphabet.indexOf(String.valueOf(
-                text.charAt(0)).toLowerCase()) % 6]);
+        mCirclePaint.setColor(colors[((int) text.charAt(0)) % 6]);
 
         postInvalidate();
     }
