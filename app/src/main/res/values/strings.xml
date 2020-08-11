@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SimpleChat</string>
+    <string name="app_name">Simple Chat</string>
     <string name="simple_chat">Simple Chat</string>
 
     <string name="hello_blank_fragment">Hello blank fragment</string>
@@ -50,4 +50,6 @@
     <string name="message">Message</string>
     <string name="network_unavailable">Network unavailable: please check your data connection</string>
     <string name="offline">offline</string>
+    <string name="channel_name">Direct messages</string>
+    <string name="channel_description">Messages which were send to you directly from someone or any group.</string>
 </resources>

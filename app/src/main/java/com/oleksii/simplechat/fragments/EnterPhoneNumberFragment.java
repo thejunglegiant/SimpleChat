@@ -1,10 +1,7 @@
 package com.oleksii.simplechat.fragments;
 
-import android.content.Context;
-import android.os.Build;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -25,7 +22,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.oleksii.simplechat.utils.CountriesCodes;
+import com.oleksii.simplechat.constants.CountriesCodes;
 import com.oleksii.simplechat.R;
 import com.oleksii.simplechat.customviews.PhoneNumberEditText;
 

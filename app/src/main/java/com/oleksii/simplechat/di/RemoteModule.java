@@ -4,7 +4,7 @@ import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.oleksii.simplechat.utils.Constants;
+import com.oleksii.simplechat.constants.NetworkConstants;
 
 import java.net.URISyntaxException;
 
@@ -28,7 +28,7 @@ public class RemoteModule {
     @Singleton
     Retrofit provideRetrofit(Gson gson) {
         return new Retrofit.Builder()
-                .baseUrl(Constants.CHAT_SERVER_URL)
+                .baseUrl(NetworkConstants.CHAT_SERVER_URL)
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
     }
@@ -37,7 +37,7 @@ public class RemoteModule {
     @Singleton
     Socket provideSocket() {
         try {
-            Socket socket = IO.socket(Constants.CHAT_SERVER_URL);
+            Socket socket = IO.socket(NetworkConstants.CHAT_SERVER_URL);
             socket.connect();
             return socket;
         } catch (URISyntaxException e) {

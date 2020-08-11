@@ -21,6 +21,7 @@ import com.oleksii.simplechat.R;
 import com.oleksii.simplechat.customviews.LogoView;
 import com.oleksii.simplechat.di.AppComponent;
 import com.oleksii.simplechat.di.DaggerAppComponent;
+import com.oleksii.simplechat.constants.NetworkConstants;
 import com.oleksii.simplechat.models.User;
 
 import org.json.JSONException;
@@ -32,7 +33,7 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final String TAG = MainActivity.class.getName();
-    private static String name, surname;
+    private static String firstname, lastname;
     public NavigationView navigationView;
     private DrawerLayout mDrawerLayout;
     @Inject Socket mSocket;
@@ -42,11 +43,11 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        AppComponent appComponent = DaggerAppComponent.create();
+        AppComponent appComponent = DaggerAppComponent.builder().build();
         appComponent.inject(this);
 
-        name = getIntent().getStringExtra("name");
-        surname = getIntent().getStringExtra("surname");
+        firstname = getIntent().getStringExtra("name");
+        lastname = getIntent().getStringExtra("surname");
 
         mDrawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.nav_view);
@@ -59,12 +60,12 @@ public class MainActivity extends AppCompatActivity
         if (!mSocket.connected()) {
             // TODO Connection StatusBar
         }
-        mSocket.emit("sync", new Gson()
-                .toJson(new User(FirebaseAuth.getInstance().getUid(), name, surname)));
-        mSocket.on("synced", synced);
-        mSocket.on("connect", onConnectEvent);
-        mSocket.on("reconnect", onReconnectEvent);
-        mSocket.on("disconnect", onDisconnectEvent);
+        mSocket.emit(NetworkConstants.SYNC_EVENT_ID, new Gson()
+                .toJson(new User(FirebaseAuth.getInstance().getUid(), firstname, lastname)));
+        mSocket.on(NetworkConstants.SYNCED_EVENT_ID, synced);
+        mSocket.on(NetworkConstants.CONNECT_EVENT_ID, onConnectEvent);
+        mSocket.on(NetworkConstants.RECONNECT_EVENT_ID, onReconnectEvent);
+        mSocket.on(NetworkConstants.DISCONNECT_EVENT_ID, onDisconnectEvent);
     }
 
     private Emitter.Listener synced = new Emitter.Listener() {
@@ -72,8 +73,8 @@ public class MainActivity extends AppCompatActivity
         public void call(Object... args) {
             JSONObject data = (JSONObject) args[0];
             try {
-                name = data.getString("firstname");
-                surname = data.getString("lastname");
+                firstname = data.getString("firstname");
+                lastname = data.getString("lastname");
                 runOnUiThread(MainActivity.this::setNames);
                 runOnUiThread(MainActivity.this::setModeOnline);
             } catch (JSONException e) {
@@ -83,8 +84,8 @@ public class MainActivity extends AppCompatActivity
     };
 
     private Emitter.Listener onReconnectEvent = args -> {
-        mSocket.emit("sync", new Gson()
-                .toJson(new User(FirebaseAuth.getInstance().getUid(), name, surname)));
+        mSocket.emit(NetworkConstants.SYNC_EVENT_ID, new Gson()
+                .toJson(new User(FirebaseAuth.getInstance().getUid(), firstname, lastname)));
     };
 
     private Emitter.Listener onDisconnectEvent = args -> {
@@ -111,7 +112,7 @@ public class MainActivity extends AppCompatActivity
         View headerView = navigationView.getHeaderView(0);
         TextView textView = headerView.findViewById(R.id.user_name);
         LogoView logoView = headerView.findViewById(R.id.user_logo);
-        String str = name + " " + surname;
+        String str = firstname + " " + lastname;
         logoView.addText(str);
         textView.setText(str);
     }
@@ -139,9 +140,6 @@ public class MainActivity extends AppCompatActivity
             case R.id.settings:
                 // TODO
                 break;
-            case R.id.faq:
-                // TODO
-                break;
             case R.id.invite_friends:
                 Navigation.findNavController(this, R.id.fragments_container)
                         .navigate(R.id.action_chatsListFragment_to_inviteFriendsFragment);
@@ -153,7 +151,11 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    public String getName() {
-        return name;
+    public String getFirstname() {
+        return firstname;
+    }
+
+    public String getLastname() {
+        return lastname;
     }
 }

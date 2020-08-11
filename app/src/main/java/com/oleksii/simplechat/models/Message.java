@@ -22,8 +22,9 @@ public class Message {
         this.body = body;
     }
 
-    public Message(String firstname, String body, Timestamp sendingTime) {
+    public Message(String firstname, String lastname, String body, Timestamp sendingTime) {
         this.firstname = firstname;
+        this.lastname = lastname;
         this.body = body;
         this.sendingTime = sendingTime;
     }

@@ -6,12 +6,19 @@ import androidx.lifecycle.ViewModel;
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.Socket;
 import com.google.firebase.auth.FirebaseAuth;
+import com.oleksii.simplechat.constants.NetworkConstants;
 import com.oleksii.simplechat.di.AppComponent;
 import com.oleksii.simplechat.di.DaggerAppComponent;
 import com.oleksii.simplechat.models.ListRoom;
+import com.oleksii.simplechat.models.Message;
 import com.oleksii.simplechat.utils.IRest;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -28,11 +35,6 @@ public class RoomsListViewModel extends ViewModel {
     @Inject Socket mSocket;
 
     public RoomsListViewModel() {
-        availableRooms.setValue(new ArrayList<>());
-
-        AppComponent appComponent = DaggerAppComponent.create();
-        appComponent.inject(this);
-
         init();
     }
 
@@ -42,8 +44,8 @@ public class RoomsListViewModel extends ViewModel {
         AppComponent appComponent = DaggerAppComponent.create();
         appComponent.inject(this);
 
-        mSocket.on("onNewGroupAdded", onInfoChanged);
-        mSocket.on("onNewMessageReceived", onInfoChanged);
+        mSocket.on(NetworkConstants.NEW_MESSAGE_EVENT_ID, onInfoChanged);
+        mSocket.on(NetworkConstants.NEW_GROUP_EVENT_ID, onInfoChanged);
 
         updateRoomsList();
     }

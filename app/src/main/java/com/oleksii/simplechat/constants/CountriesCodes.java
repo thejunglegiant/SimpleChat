@@ -1,4 +1,4 @@
-package com.oleksii.simplechat.utils;
+package com.oleksii.simplechat.constants;
 
 public enum CountriesCodes {
 

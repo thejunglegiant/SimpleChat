@@ -13,19 +13,20 @@ public class ListRoom {
     private String lastMessage;
     @SerializedName("stime")
     private Timestamp lastActivity;
-    private Boolean isAttached;
+    // For UI purposes
+    private Boolean isAttached = false;
+    private Boolean hasNewMessages = false;
+
+    public ListRoom(long id, String title) {
+        this.id = id;
+        this.title = title;
+    }
 
     public ListRoom(String title, String lastMessage, Timestamp lastActivity, Boolean isAttached) {
         this.title = title;
         this.lastMessage = lastMessage;
         this.lastActivity = lastActivity;
         this.isAttached = isAttached;
-    }
-
-    public ListRoom(String title, String lastMessage, Timestamp lastActivity) {
-        this.title = title;
-        this.lastMessage = lastMessage;
-        this.lastActivity = lastActivity;
     }
 
     public void setTitle(String title) {
@@ -74,5 +75,13 @@ public class ListRoom {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public Boolean getHasNewMessages() {
+        return hasNewMessages;
+    }
+
+    public void setHasNewMessages(Boolean hasNewMessages) {
+        this.hasNewMessages = hasNewMessages;
     }
 }

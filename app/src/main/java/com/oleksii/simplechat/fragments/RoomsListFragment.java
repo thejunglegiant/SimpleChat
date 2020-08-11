@@ -1,9 +1,11 @@
 package com.oleksii.simplechat.fragments;
 
+import android.app.NotificationManager;
 import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -15,18 +17,24 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.github.nkzawa.socketio.client.Socket;
 import com.google.firebase.auth.FirebaseAuth;
 import com.oleksii.simplechat.activities.MainActivity;
 import com.oleksii.simplechat.R;
 import com.oleksii.simplechat.adapters.RoomsListAdapter;
+import com.oleksii.simplechat.di.AppComponent;
+import com.oleksii.simplechat.di.DaggerAppComponent;
 import com.oleksii.simplechat.viewmodels.RoomsListViewModel;
 
 import java.util.ArrayList;
+
+import javax.inject.Inject;
 
 public class RoomsListFragment extends Fragment {
 
     private static final String TAG = RoomsListFragment.class.getName();
     private MainActivity parentActivity;
+    @Inject Socket mSocket;
 
     public RoomsListFragment() { }
 
@@ -34,6 +42,13 @@ public class RoomsListFragment extends Fragment {
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         parentActivity = (MainActivity) getActivity();
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        AppComponent appComponent = DaggerAppComponent.create();
+        appComponent.inject(this);
     }
 
     @Override

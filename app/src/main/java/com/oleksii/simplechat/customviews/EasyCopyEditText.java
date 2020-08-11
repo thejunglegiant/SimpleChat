@@ -40,7 +40,6 @@ public class EasyCopyEditText extends androidx.appcompat.widget.AppCompatEditTex
         setBackground(getResources().getDrawable(R.drawable.easycopy_edittext_background, null));
         setTextColor(getResources().getColor(R.color.colorGray, null));
         setCompoundDrawablePadding(48);
-        setTextSize(18f);
 
         setOnTouchListener(new OnTouchListener() {
             @Override

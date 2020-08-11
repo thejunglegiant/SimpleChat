@@ -68,6 +68,7 @@
             style="@style/textStandard"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginVertical="@dimen/def_margin"
             android:layout_marginEnd="@dimen/def_margin"
             android:layout_weight="3"
             android:background="@android:color/transparent"
@@ -75,12 +76,14 @@
             android:inputType="textCapSentences|textMultiLine"
             android:textSize="24sp" />
 
-        <Button
+        <ImageButton
             android:id="@+id/send_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Send!"
-            android:textAllCaps="false" />
+            android:background="@drawable/round_ripple"
+            android:src="@drawable/ic_send_button"
+            android:visibility="gone"
+            tools:visibility="visible" />
 
     </LinearLayout>
 

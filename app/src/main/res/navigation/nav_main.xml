@@ -48,8 +48,11 @@
             app:destination="@id/roomsListFragment"
             app:enterAnim="@anim/enter_from_left"
             app:exitAnim="@anim/exit_to_right"
+            app:launchSingleTop="true"
             app:popEnterAnim="@anim/enter_from_right"
-            app:popExitAnim="@anim/exit_to_left" />
+            app:popExitAnim="@anim/exit_to_left"
+            app:popUpTo="@id/roomsListFragment"
+            app:popUpToInclusive="true" />
         <argument
             android:name="roomId"
             app:argType="long" />

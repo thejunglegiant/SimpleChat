@@ -11,14 +11,17 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.google.android.material.snackbar.Snackbar;
 import com.oleksii.simplechat.activities.MainActivity;
 import com.oleksii.simplechat.R;
 import com.oleksii.simplechat.adapters.MessagesListAdapter;
@@ -64,8 +67,6 @@ public class ExactRoomFragment extends Fragment {
         LogoView roomLogo = rootView.findViewById(R.id.room_logo);
         roomLogo.addText(roomTitle);
 
-        EditText messageBox = rootView.findViewById(R.id.message_box);
-
         RecyclerView messagesList = rootView.findViewById(R.id.messages_list);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
@@ -75,21 +76,58 @@ public class ExactRoomFragment extends Fragment {
         MessagesListAdapter adapter = new MessagesListAdapter(new ArrayList<>(), getContext());
         messagesList.setAdapter(adapter);
 
-        ExactRoomVMFactory factory = new ExactRoomVMFactory(roomId, parentActivity.getName());
-        ExactRoomViewModel viewModel = new ViewModelProvider(this, factory).get(ExactRoomViewModel.class);
+        ExactRoomVMFactory factory = new ExactRoomVMFactory(roomId, parentActivity.getFirstname(),
+                parentActivity.getLastname(), getContext());
+        ExactRoomViewModel viewModel = new ViewModelProvider(this, factory)
+                .get(ExactRoomViewModel.class);
         viewModel.messages.observe(getViewLifecycleOwner(), list -> {
             adapter.submitAll(list);
             messagesList.scrollToPosition(adapter.getItemCount() - 1);
         });
 
-        Button sendButton = rootView.findViewById(R.id.send_button);
+        ImageButton sendButton = rootView.findViewById(R.id.send_button);
+        EditText messageEditText = rootView.findViewById(R.id.message_box);
+        Animation appearAnim = AnimationUtils.loadAnimation(getContext(), R.anim.send_button_appear);
+        Animation disappearAnim = AnimationUtils.loadAnimation(getContext(), R.anim.send_button_disappear);
+        disappearAnim.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                sendButton.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        messageEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (s.length() > 0 && sendButton.getVisibility() == View.GONE) {
+                    sendButton.startAnimation(appearAnim);
+                    sendButton.setVisibility(View.VISIBLE);
+                } else if (s.length() < 1) {
+                    sendButton.startAnimation(disappearAnim);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) { }
+        });
+
         sendButton.setOnClickListener(v -> {
-            String message = messageBox.getText().toString().trim();
+            String message = messageEditText.getText().toString().trim();
             if (!message.isEmpty()) {
                 viewModel.sendMessage(message);
-                messageBox.setText("");
-            } else {
-                Snackbar.make(v, "Write something first!", Snackbar.LENGTH_SHORT).show();
+                messageEditText.setText("");
             }
         });
 

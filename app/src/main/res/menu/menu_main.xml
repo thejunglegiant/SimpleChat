@@ -23,10 +23,5 @@
             android:id="@+id/invite_friends"
             android:title="@string/invite_friends"
             android:icon="@drawable/invite_friends_ic" />
-
-        <item
-            android:id="@+id/faq"
-            android:title="@string/faq"
-            android:icon="@drawable/help_ic" />
     </group>
 </menu>
