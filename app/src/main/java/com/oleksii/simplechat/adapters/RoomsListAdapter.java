@@ -17,17 +17,17 @@ import com.oleksii.simplechat.models.ListRoom;
 import com.oleksii.simplechat.utils.Util;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 public class RoomsListAdapter extends RecyclerView.Adapter<RoomsListAdapter.ViewHolder> {
 
-    private ArrayList<ListRoom> list;
+    private LinkedList<ListRoom> mRoomsList = new LinkedList<>();
 
-    public RoomsListAdapter(ArrayList<ListRoom> list) {
-        this.list = list;
-    }
+    public RoomsListAdapter() { }
 
-    public void submitAll(ArrayList<ListRoom> list) {
-        this.list = list;
+    public void submitAll(LinkedList<ListRoom> list) {
+        mRoomsList.clear();
+        mRoomsList.addAll(list);
         notifyDataSetChanged();
     }
 
@@ -40,35 +40,12 @@ public class RoomsListAdapter extends RecyclerView.Adapter<RoomsListAdapter.View
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        ListRoom obj = list.get(position);
-
-        holder.logoView.addText(obj.getTitle());
-        holder.title.setText(obj.getTitle());
-        if (obj.getLastMessage() == null || obj.getLastActivity() == null) {
-            holder.whoSent.setVisibility(View.GONE);
-            holder.lastMessageTime.setVisibility(View.GONE);
-            holder.lastMessage.setText(R.string.no_messages_yet);
-        } else {
-            holder.whoSent.setVisibility(View.VISIBLE);
-            holder.lastMessageTime.setVisibility(View.VISIBLE);
-            holder.whoSent.setText(obj.getFirstname() + ": ");
-            holder.lastMessage.setText(obj.getLastMessage());
-            holder.lastMessageTime.setText(Util.getTimeString(obj.getLastActivity(), false));
-        }
-
-        holder.mainLayout.setOnClickListener(v -> {
-            Bundle bundle = new Bundle();
-            bundle.putLong("roomId", obj.getId());
-            bundle.putString("roomTitle", obj.getTitle());
-            Navigation.findNavController(v).navigate(
-                    R.id.action_chatsListFragment_to_exactRoomFragment, bundle
-            );
-        });
+        holder.bind(mRoomsList.get(position));
     }
 
     @Override
     public int getItemCount() {
-        return list.size();
+        return mRoomsList.size();
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -85,6 +62,30 @@ public class RoomsListAdapter extends RecyclerView.Adapter<RoomsListAdapter.View
             lastMessageTime = itemView.findViewById(R.id.date_time);
             logoView = itemView.findViewById(R.id.room_logo);
             mainLayout = itemView.findViewById(R.id.main_layout);
+        }
+
+        void bind(ListRoom listRoom) {
+            logoView.addText(listRoom.getTitle());
+            title.setText(listRoom.getTitle());
+            if (listRoom.getLastMessage() == null || listRoom.getLastActivity() == null) {
+                whoSent.setVisibility(View.GONE);
+                lastMessageTime.setVisibility(View.GONE);
+                lastMessage.setText(R.string.no_messages_yet);
+            } else {
+                whoSent.setVisibility(View.VISIBLE);
+                lastMessageTime.setVisibility(View.VISIBLE);
+                whoSent.setText(listRoom.getFirstname() + ": ");
+                lastMessage.setText(listRoom.getLastMessage());
+                lastMessageTime.setText(Util.getTimeString(listRoom.getLastActivity(), false));
+            }
+
+            mainLayout.setOnClickListener(v -> {
+                Bundle bundle = new Bundle();
+                bundle.putLong("roomId", listRoom.getId());
+                bundle.putString("roomTitle", listRoom.getTitle());
+                Navigation.findNavController(v).navigate(
+                        R.id.action_chatsListFragment_to_exactRoomFragment, bundle);
+            });
         }
 
     }

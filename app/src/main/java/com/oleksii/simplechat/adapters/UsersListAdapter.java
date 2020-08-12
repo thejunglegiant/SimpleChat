@@ -16,29 +16,27 @@ import com.oleksii.simplechat.viewmodels.NewGroupViewModel;
 import com.oleksii.simplechat.models.User;
 import com.oleksii.simplechat.utils.Util;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 
-public class PeopleListAdapter extends RecyclerView.Adapter<PeopleListAdapter.ViewHolder> {
+public class UsersListAdapter extends RecyclerView.Adapter<UsersListAdapter.ViewHolder> {
 
-    private ArrayList<User> list;
+    private LinkedList<User> mUsersList = new LinkedList<>();
     private NewGroupViewModel viewModel;
     private Boolean withTickIndicators;
 
-    public PeopleListAdapter(ArrayList<User> list, NewGroupViewModel viewModel) {
-        this.list = list;
+    public UsersListAdapter(NewGroupViewModel viewModel) {
         this.viewModel = viewModel;
         this.withTickIndicators = true;
     }
 
-    public PeopleListAdapter(ArrayList<User> list, NewGroupViewModel viewModel,
-                             Boolean withTickIndicators) {
-        this.list = list;
+    public UsersListAdapter(NewGroupViewModel viewModel, Boolean withTickIndicators) {
         this.viewModel = viewModel;
         this.withTickIndicators = withTickIndicators;
     }
 
-    public void submitAll(ArrayList<User> list) {
-        this.list = list;
+    public void submitAll(LinkedList<User> list) {
+        mUsersList.clear();
+        mUsersList.addAll(list);
         notifyDataSetChanged();
     }
 
@@ -51,33 +49,12 @@ public class PeopleListAdapter extends RecyclerView.Adapter<PeopleListAdapter.Vi
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        User obj = list.get(position);
-        String nameStr = obj.getFirstname() + " " + obj.getLastname();
-        String sessionStr = Util.getTimeString(obj.getLastSession(), true);
-
-        holder.logoView.addText(nameStr);
-        holder.userName.setText(nameStr);
-        holder.lastSeenTime.setText(sessionStr);
-        if (withTickIndicators) {
-            holder.actualLayout.setOnClickListener(v -> {
-                if (holder.tickIndicator.getVisibility() == View.VISIBLE) {
-                    holder.tickIndicator.setVisibility(View.GONE);
-                    viewModel.removeCheckedUser(obj);
-                } else {
-                    holder.tickIndicator.setVisibility(View.VISIBLE);
-                    viewModel.addCheckedUser(obj);
-                }
-            });
-
-            if (viewModel.getCheckedUsers().contains(obj)) {
-                holder.tickIndicator.setVisibility(View.VISIBLE);
-            }
-        }
+        holder.bind(mUsersList.get(position), withTickIndicators, viewModel);
     }
 
     @Override
     public int getItemCount() {
-        return list.size();
+        return mUsersList.size();
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -96,5 +73,28 @@ public class PeopleListAdapter extends RecyclerView.Adapter<PeopleListAdapter.Vi
             actualLayout = itemView.findViewById(R.id.actual_layout);
         }
 
+        public void bind(User user, Boolean withTickIndicators, NewGroupViewModel viewModel) {
+            String nameStr = user.getFirstname() + " " + user.getLastname();
+            String sessionStr = Util.getTimeString(user.getLastSession(), true);
+
+            logoView.addText(nameStr);
+            userName.setText(nameStr);
+            lastSeenTime.setText(sessionStr);
+            if (withTickIndicators) {
+                actualLayout.setOnClickListener(v -> {
+                    if (tickIndicator.getVisibility() == View.VISIBLE) {
+                        tickIndicator.setVisibility(View.GONE);
+                        viewModel.removeCheckedUser(user);
+                    } else {
+                        tickIndicator.setVisibility(View.VISIBLE);
+                        viewModel.addCheckedUser(user);
+                    }
+                });
+
+                if (viewModel.getCheckedUsers().contains(user)) {
+                    tickIndicator.setVisibility(View.VISIBLE);
+                }
+            }
+        }
     }
 }

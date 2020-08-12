@@ -28,6 +28,11 @@ import com.oleksii.simplechat.customviews.PhoneNumberEditText;
 
 public class EnterPhoneNumberFragment extends Fragment {
 
+    private Toolbar toolbar;
+    private Spinner spinner;
+    private EditText countryCodeText, phoneNumberText;
+    private FloatingActionButton fab;
+
     public EnterPhoneNumberFragment() { }
 
     @Override
@@ -42,32 +47,27 @@ public class EnterPhoneNumberFragment extends Fragment {
 
         View rootView = inflater.inflate(R.layout.fragment_enter_phone_number, container, false);
 
-        Toolbar toolbar = rootView.findViewById(R.id.toolbar);
+        toolbar = rootView.findViewById(R.id.toolbar);
+        spinner = rootView.findViewById(R.id.countries_list);
+        countryCodeText = rootView.findViewById(R.id.country_code_text);
+        phoneNumberText = rootView.findViewById(R.id.phone_number_text);
+        fab = rootView.findViewById(R.id.fab);
+
+        setupToolbar();
+        setupCountiesSpinner();
+        setupEditTexts();
+        setupFab();
+
+        return rootView;
+    }
+
+    private void setupToolbar() {
         toolbar.setTitle(R.string.your_phone);
         toolbar.setNavigationOnClickListener(v -> Navigation.findNavController(v)
                 .navigate(R.id.action_enterPhoneNumberFragment_to_loginFragment));
+    }
 
-        EditText countryCodeText = rootView.findViewById(R.id.country_code_text);
-        EditText phoneNumberText = rootView.findViewById(R.id.phone_number_text);
-        Selection.setSelection(phoneNumberText.getText(), phoneNumberText.getText().length());
-
-        FloatingActionButton fab = rootView.findViewById(R.id.fab);
-        fab.setOnClickListener(v -> {
-            if (PhoneNumberEditText.validatePhoneNumber(phoneNumberText.getText().toString())
-                && CountriesCodes.getIndex(countryCodeText.getText().toString().substring(1)) != -1) {
-                Bundle bundle = new Bundle();
-                bundle.putString("countryCode", countryCodeText.getText().toString().trim());
-                bundle.putString("phoneNumber", phoneNumberText.getText().toString().replace(" ", ""));
-                Navigation.findNavController(v).navigate(
-                        R.id.action_enterPhoneNumberFragment_to_verifyPhoneNumberFragment, bundle
-                );
-            } else {
-                Toast.makeText(getContext(), R.string.phone_number_is_incorrect, Toast.LENGTH_SHORT)
-                        .show();
-            }
-        });
-
-        Spinner spinner = rootView.findViewById(R.id.countries_list);
+    private void setupCountiesSpinner() {
         int size = CountriesCodes.values().length;
         String[] countries = new String[size];
         int i = 0;
@@ -90,7 +90,10 @@ public class EnterPhoneNumberFragment extends Fragment {
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {}
         });
+    }
 
+    public void setupEditTexts() {
+        Selection.setSelection(phoneNumberText.getText(), phoneNumberText.getText().length());
         countryCodeText.addTextChangedListener(new TextWatcher() {
             String tmpCode = "";
 
@@ -119,7 +122,22 @@ public class EnterPhoneNumberFragment extends Fragment {
             @Override
             public void afterTextChanged(Editable s) { }
         });
+    }
 
-        return rootView;
+    private void setupFab() {
+        fab.setOnClickListener(v -> {
+            if (PhoneNumberEditText.validatePhoneNumber(phoneNumberText.getText().toString())
+                    && CountriesCodes.getIndex(countryCodeText.getText().toString().substring(1)) != -1) {
+                Bundle bundle = new Bundle();
+                bundle.putString("countryCode", countryCodeText.getText().toString().trim());
+                bundle.putString("phoneNumber", phoneNumberText.getText().toString().replace(" ", ""));
+                Navigation.findNavController(v).navigate(
+                        R.id.action_enterPhoneNumberFragment_to_verifyPhoneNumberFragment, bundle
+                );
+            } else {
+                Toast.makeText(getContext(), R.string.phone_number_is_incorrect, Toast.LENGTH_SHORT)
+                        .show();
+            }
+        });
     }
 }

@@ -10,15 +10,9 @@ import com.oleksii.simplechat.constants.NetworkConstants;
 import com.oleksii.simplechat.di.AppComponent;
 import com.oleksii.simplechat.di.DaggerAppComponent;
 import com.oleksii.simplechat.models.ListRoom;
-import com.oleksii.simplechat.models.Message;
 import com.oleksii.simplechat.utils.IRest;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedList;
 
 import javax.inject.Inject;
 
@@ -30,7 +24,7 @@ import retrofit2.Retrofit;
 public class RoomsListViewModel extends ViewModel {
 
     private static final String TAG = RoomsListViewModel.class.getName();
-    public final MutableLiveData<ArrayList<ListRoom>> availableRooms = new MutableLiveData<>();
+    public final MutableLiveData<LinkedList<ListRoom>> availableRooms = new MutableLiveData<>();
     @Inject Retrofit retrofit;
     @Inject Socket mSocket;
 
@@ -39,7 +33,7 @@ public class RoomsListViewModel extends ViewModel {
     }
 
     private void init() {
-        availableRooms.setValue(new ArrayList<>());
+        availableRooms.setValue(new LinkedList<>());
 
         AppComponent appComponent = DaggerAppComponent.create();
         appComponent.inject(this);
@@ -52,22 +46,22 @@ public class RoomsListViewModel extends ViewModel {
 
     private void updateRoomsList() {
         IRest IRest = retrofit.create(com.oleksii.simplechat.utils.IRest.class);
-        Call<ArrayList<ListRoom>> call = IRest.getAvailableRooms(
+        Call<LinkedList<ListRoom>> call = IRest.getAvailableRooms(
                 FirebaseAuth.getInstance().getUid() + "/getRooms");
 
-        call.enqueue(new Callback<ArrayList<ListRoom>>() {
+        call.enqueue(new Callback<LinkedList<ListRoom>>() {
             @Override
-            public void onResponse(Call<ArrayList<ListRoom>> call, Response<ArrayList<ListRoom>> response) {
+            public void onResponse(Call<LinkedList<ListRoom>> call, Response<LinkedList<ListRoom>> response) {
                 if (!response.isSuccessful()) {
                     return;
                 }
 
-                ArrayList<ListRoom> rooms = response.body();
+                LinkedList<ListRoom> rooms = response.body();
                 availableRooms.setValue(rooms);
             }
 
             @Override
-            public void onFailure(Call<ArrayList<ListRoom>> call, Throwable t) {
+            public void onFailure(Call<LinkedList<ListRoom>> call, Throwable t) {
 
             }
         });

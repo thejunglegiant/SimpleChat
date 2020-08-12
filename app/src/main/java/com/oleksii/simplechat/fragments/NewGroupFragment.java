@@ -15,10 +15,8 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.oleksii.simplechat.R;
-import com.oleksii.simplechat.adapters.PeopleListAdapter;
+import com.oleksii.simplechat.adapters.UsersListAdapter;
 import com.oleksii.simplechat.viewmodels.NewGroupViewModel;
-
-import java.util.ArrayList;
 
 public class NewGroupFragment extends Fragment {
 
@@ -42,7 +40,7 @@ public class NewGroupFragment extends Fragment {
 
         RecyclerView recyclerView = rootView.findViewById(R.id.available_people_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        PeopleListAdapter adapter = new PeopleListAdapter(new ArrayList<>(), viewModel);
+        UsersListAdapter adapter = new UsersListAdapter(viewModel);
         recyclerView.setAdapter(adapter);
 
         rootView.findViewById(R.id.fab).setOnClickListener(v -> {

@@ -1,14 +1,15 @@
 package com.oleksii.simplechat.models;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 public class NewRoom {
 
     private String title;
-    private ArrayList<User> users;
+    private LinkedList<User> users;
 
 
-    public NewRoom(String title, ArrayList<User> users) {
+    public NewRoom(String title, LinkedList<User> users) {
         this.title = title;
         this.users = users;
     }
@@ -17,7 +18,7 @@ public class NewRoom {
         return title;
     }
 
-    public ArrayList<User> getUsers() {
+    public LinkedList<User> getUsers() {
         return users;
     }
 }

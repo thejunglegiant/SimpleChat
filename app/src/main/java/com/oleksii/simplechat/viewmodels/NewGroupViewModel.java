@@ -14,7 +14,7 @@ import com.oleksii.simplechat.models.NewRoom;
 import com.oleksii.simplechat.models.User;
 import com.oleksii.simplechat.utils.IRest;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 
 import javax.inject.Inject;
 
@@ -28,11 +28,11 @@ public class NewGroupViewModel extends ViewModel {
     private final String TAG = this.getClass().getName();
     @Inject Socket mSocket;
     @Inject Retrofit retrofit;
-    public MutableLiveData<ArrayList<User>> availableUsers = new MutableLiveData<>();
-    public MutableLiveData<ArrayList<User>> checkedUsers = new MutableLiveData<>();
+    public MutableLiveData<LinkedList<User>> availableUsers = new MutableLiveData<>();
+    public MutableLiveData<LinkedList<User>> checkedUsers = new MutableLiveData<>();
 
     public NewGroupViewModel() {
-        checkedUsers.setValue(new ArrayList<>());
+        checkedUsers.setValue(new LinkedList<>());
 
         AppComponent appComponent = DaggerAppComponent.create();
         appComponent.inject(this);
@@ -42,40 +42,40 @@ public class NewGroupViewModel extends ViewModel {
 
     private void init() {
         IRest userRest = retrofit.create(IRest.class);
-        Call<ArrayList<User>> call = userRest.getAvailableUsers(
+        Call<LinkedList<User>> call = userRest.getAvailableUsers(
                 FirebaseAuth.getInstance().getUid() + "/getUsers");
 
-        call.enqueue(new Callback<ArrayList<User>>() {
+        call.enqueue(new Callback<LinkedList<User>>() {
             @Override
-            public void onResponse(Call<ArrayList<User>> call, Response<ArrayList<User>> response) {
+            public void onResponse(Call<LinkedList<User>> call, Response<LinkedList<User>> response) {
                 if (!response.isSuccessful()) {
                     return;
                 }
 
-                ArrayList<User> users = response.body();
+                LinkedList<User> users = response.body();
                 availableUsers.setValue(users);
             }
 
             @Override
-            public void onFailure(Call<ArrayList<User>> call, Throwable t) {
+            public void onFailure(Call<LinkedList<User>> call, Throwable t) {
                 Log.e(TAG, t.getMessage());
             }
         });
     }
 
     public void addCheckedUser(User user) {
-        ArrayList<User> tmp = checkedUsers.getValue();
+        LinkedList<User> tmp = checkedUsers.getValue();
         tmp.add(user);
         checkedUsers.setValue(tmp);
     }
 
     public void removeCheckedUser(User user) {
-        ArrayList<User> tmp = checkedUsers.getValue();
+        LinkedList<User> tmp = checkedUsers.getValue();
         tmp.remove(user);
         checkedUsers.setValue(tmp);
     }
 
-    public ArrayList<User> getCheckedUsers() {
+    public LinkedList<User> getCheckedUsers() {
         return checkedUsers.getValue();
     }
 

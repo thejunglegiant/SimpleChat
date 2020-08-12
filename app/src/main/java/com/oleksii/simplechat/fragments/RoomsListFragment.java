@@ -1,6 +1,5 @@
 package com.oleksii.simplechat.fragments;
 
-import android.app.NotificationManager;
 import android.content.Context;
 import android.os.Bundle;
 
@@ -12,7 +11,6 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,13 +24,14 @@ import com.oleksii.simplechat.di.AppComponent;
 import com.oleksii.simplechat.di.DaggerAppComponent;
 import com.oleksii.simplechat.viewmodels.RoomsListViewModel;
 
-import java.util.ArrayList;
-
 import javax.inject.Inject;
 
 public class RoomsListFragment extends Fragment {
 
-    private static final String TAG = RoomsListFragment.class.getName();
+    private Toolbar toolbar;
+    private RecyclerView roomsListRecycler;
+    private RoomsListAdapter mAdapter = new RoomsListAdapter();;
+    private RoomsListViewModel roomsListViewModel;
     private MainActivity parentActivity;
     @Inject Socket mSocket;
 
@@ -56,11 +55,25 @@ public class RoomsListFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_rooms_list, container, false);
 
-        Toolbar toolbar = rootView.findViewById(R.id.toolbar);
+        toolbar = rootView.findViewById(R.id.toolbar);
+        roomsListRecycler = rootView.findViewById(R.id.rooms_list);
+
+        setupToolbar();
+        setupAdapter();
+        setupViewModel();
+
+        return rootView;
+    }
+
+    private void setupViewModel() {
+        roomsListViewModel = new ViewModelProvider(requireActivity()).get(RoomsListViewModel.class);
+        roomsListViewModel.availableRooms.observe(getViewLifecycleOwner(), mAdapter::submitAll);
+    }
+
+    private void setupToolbar() {
         toolbar.inflateMenu(R.menu.toolbar_main);
         toolbar.setOnMenuItemClickListener(item -> {
             if (item.getItemId() == R.id.search_button) {
-                Log.i(TAG, item.getItemId() + "");
                 // TODO
                 // temporary
                 FirebaseAuth.getInstance().signOut();
@@ -71,16 +84,12 @@ public class RoomsListFragment extends Fragment {
         toolbar.setNavigationOnClickListener(v -> {
             parentActivity.toggleDrawer();
         });
+    }
 
-        RecyclerView chatsList = rootView.findViewById(R.id.rooms_list);
-        chatsList.setLayoutManager(new LinearLayoutManager(getContext()));
-        RoomsListAdapter adapter = new RoomsListAdapter(new ArrayList<>());
-        chatsList.setAdapter(adapter);
-
-        RoomsListViewModel viewModel = new ViewModelProvider(this).get(RoomsListViewModel.class);
-
-        viewModel.availableRooms.observe(getViewLifecycleOwner(), adapter::submitAll);
-
-        return rootView;
+    private void setupAdapter() {
+        LinearLayoutManager linearLayoutManager =
+                new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
+        roomsListRecycler.setLayoutManager(linearLayoutManager);
+        roomsListRecycler.setAdapter(mAdapter);
     }
 }

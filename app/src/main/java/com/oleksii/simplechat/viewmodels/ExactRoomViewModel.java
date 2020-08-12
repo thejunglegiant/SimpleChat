@@ -21,7 +21,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
+import java.util.LinkedList;
 
 import javax.inject.Inject;
 
@@ -33,7 +33,7 @@ import retrofit2.Retrofit;
 public class ExactRoomViewModel extends ViewModel {
 
     private static final String TAG = "ExactRoomViewModel";
-    public MutableLiveData<ArrayList<Message>> messages = new MutableLiveData<>();
+    public MutableLiveData<LinkedList<Message>> messages = new MutableLiveData<>();
     private long roomId;
     private String firstname;
     private String lastname;
@@ -65,23 +65,23 @@ public class ExactRoomViewModel extends ViewModel {
     }
 
     private void init() {
-        messages.setValue(new ArrayList<>());
+        messages.setValue(new LinkedList<>());
         mSocket.on(NetworkConstants.NEW_MESSAGE_EVENT_ID, onNewMessageReceived);
 
         IRest IRest = retrofit.create(com.oleksii.simplechat.utils.IRest.class);
-        Call<ArrayList<Message>> call = IRest.getAllRoomMessages(
+        Call<LinkedList<Message>> call = IRest.getAllRoomMessages(
                 FirebaseAuth.getInstance().getUid() + "/" + roomId + "/getMessages"
         );
 
-        call.enqueue(new Callback<ArrayList<Message>>() {
+        call.enqueue(new Callback<LinkedList<Message>>() {
             @Override
-            public void onResponse(Call<ArrayList<Message>> call, Response<ArrayList<Message>> response) {
+            public void onResponse(Call<LinkedList<Message>> call, Response<LinkedList<Message>> response) {
                 if (response.isSuccessful() && response.body() != null)
                     messages.setValue(response.body());
             }
 
             @Override
-            public void onFailure(Call<ArrayList<Message>> call, Throwable t) {
+            public void onFailure(Call<LinkedList<Message>> call, Throwable t) {
                 Log.e(TAG, t.getMessage());
             }
         });
@@ -106,7 +106,7 @@ public class ExactRoomViewModel extends ViewModel {
     };
 
     public void addMessage(Message message) {
-        ArrayList<Message> tmp = messages.getValue();
+        LinkedList<Message> tmp = messages.getValue();
         tmp.add(message);
         messages.postValue(tmp);
     }

@@ -31,22 +31,35 @@ import java.util.concurrent.TimeUnit;
 public class VerifyPhoneNumberFragment extends Fragment {
 
     private static final String TAG = "VerifyPhoneNumberFragment";
-    private String verificationId;
+    private String verificationId, countryCode, phoneNumber;
     private FirebaseAuth auth;
+    private Toolbar toolbar;
+    private EditText codeVerification;
+    private TextView contactUs;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        View rootview = inflater.inflate(R.layout.fragment_verify_phone_number, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_verify_phone_number, container, false);
+
+        toolbar = rootView.findViewById(R.id.toolbar);
+        codeVerification = rootView.findViewById(R.id.code_text);
+        contactUs = rootView.findViewById(R.id.contact_us);
+
+        countryCode = getArguments().getString("countryCode");
+        phoneNumber = getArguments().getString("phoneNumber");
 
         auth = FirebaseAuth.getInstance();
         auth.useAppLanguage();
-        String countryCode = getArguments().getString("countryCode");
-        String phoneNumber = getArguments().getString("phoneNumber");
         sendVerificationCode(countryCode + phoneNumber);
 
-        Toolbar toolbar = rootview.findViewById(R.id.toolbar);
+        setupToolbar();
+        setupListeners();
+
+        return rootView;
+    }
+
+    private void setupToolbar() {
         toolbar.setTitle(countryCode + " " + PhoneNumberEditText.formatPhoneNumber(phoneNumber));
         toolbar.setNavigationOnClickListener(v -> {
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -62,22 +75,20 @@ public class VerifyPhoneNumberFragment extends Fragment {
                     });
             builder.show();
         });
+    }
 
-        EditText codeVerification = rootview.findViewById(R.id.code_text);
+    private void setupListeners() {
         codeVerification.setOnEditorActionListener((v, actionId, event) -> {
             String code = codeVerification.getText().toString().trim();
             verifyCode(code);
             return true;
         });
 
-        TextView contactUs = rootview.findViewById(R.id.contact_us);
         contactUs.setOnClickListener(v -> {
             Intent browserIntent = new Intent(Intent.ACTION_VIEW,
                     Uri.parse(getResources().getString(R.string.author_contact)));
             startActivity(browserIntent);
         });
-
-        return rootview;
     }
 
     private void verifyCode(String code) {
