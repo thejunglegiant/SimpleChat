@@ -49,6 +49,6 @@
         android:layout_margin="@dimen/def_margin"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@drawable/pencil_ic" />
+        app:srcCompat="@drawable/ic_pencil" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

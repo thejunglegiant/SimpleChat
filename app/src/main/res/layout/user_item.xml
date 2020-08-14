@@ -46,7 +46,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/def_margin"
         android:contentDescription="@string/tick_logo"
-        android:src="@drawable/tick_primary"
+        android:src="@drawable/ic_tick_primary"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

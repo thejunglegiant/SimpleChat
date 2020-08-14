@@ -94,9 +94,9 @@ public class FinallyCreateGroupFragment extends Fragment {
                 .debounce(200, TimeUnit.MILLISECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(input -> {
-                    if (input.length() > 0) {
+                    if (input.toString().trim().length() > 0) {
                         roomLogo.setVisibility(View.VISIBLE);
-                        roomLogo.addText(input.toString());
+                        roomLogo.addText(input.toString().trim());
                     } else {
                         roomLogo.setVisibility(View.INVISIBLE);
                     }

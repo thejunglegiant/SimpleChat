@@ -167,6 +167,13 @@ public class ExactRoomFragment extends Fragment {
         layoutManager.setSmoothScrollbarEnabled(false);
         messagesListRecycler.setLayoutManager(layoutManager);
         messagesListRecycler.setAdapter(mAdapter);
+        messagesListRecycler.addOnLayoutChangeListener((v, left, top, right, bottom,
+                                                        oldLeft, oldTop, oldRight, oldBottom) -> {
+            if (bottom < oldBottom) {
+                messagesListRecycler.postDelayed(() ->
+                        messagesListRecycler.smoothScrollToPosition(mAdapter.getItemCount()), 100);
+            }
+        });
     }
 
     private void setupViewModel() {

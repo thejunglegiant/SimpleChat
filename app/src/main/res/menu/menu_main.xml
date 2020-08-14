@@ -4,24 +4,24 @@
 
         <item
             android:id="@+id/new_group"
-            android:icon="@drawable/people_ic"
+            android:icon="@drawable/ic_people"
             android:title="@string/new_group" />
 
         <item
             android:id="@+id/saved_messages"
             android:title="@string/saved_messages"
-            android:icon="@drawable/bookmark_ic" />
+            android:icon="@drawable/ic_bookmark" />
 
         <item
             android:id="@+id/settings"
             android:title="@string/settings"
-            android:icon="@drawable/settings_ic" />
+            android:icon="@drawable/ic_settings" />
 
     </group>
     <group android:id="@+id/help">
         <item
             android:id="@+id/invite_friends"
             android:title="@string/invite_friends"
-            android:icon="@drawable/invite_friends_ic" />
+            android:icon="@drawable/ic_invite_friends" />
     </group>
 </menu>

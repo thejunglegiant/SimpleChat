@@ -13,7 +13,7 @@
         android:background="?attr/colorPrimary"
         android:theme="@style/AppTheme.AppBarOverlay"
         app:layout_constraintTop_toTopOf="parent"
-        app:navigationIcon="@drawable/ic_action_back"
+        app:navigationIcon="@drawable/ic_arrow_back"
         app:popupTheme="@style/AppTheme.PopupOverlay"
         app:title="@string/new_group" />
 
@@ -79,6 +79,6 @@
         android:layout_margin="@dimen/def_margin"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@drawable/tick" />
+        app:srcCompat="@drawable/ic_tick" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
