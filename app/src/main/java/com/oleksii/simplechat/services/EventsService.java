@@ -50,7 +50,6 @@ public class EventsService extends Service {
         mSocket.on(NetworkConstants.SYNCED_EVENT_ID, synced);
         mSocket.on(NetworkConstants.RECONNECT_EVENT_ID, onReconnectEvent);
         mSocket.on(NetworkConstants.NEW_MESSAGE_EVENT_ID, onNewMessageReceived);
-//        mSocket.on(NetworkConstants.DISCONNECT_EVENT_ID, onDisconnectEvent);
     }
 
     private Emitter.Listener synced = new Emitter.Listener() {
@@ -95,10 +94,6 @@ public class EventsService extends Service {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-    };
-
-    private Emitter.Listener onDisconnectEvent = args -> {
-        stopSelf();
     };
 
     @Nullable

@@ -29,22 +29,54 @@
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="a" />
 
-            <TextView
-                android:id="@+id/room_title"
-                style="@style/textStandard"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/def_margin"
-                android:textColor="@color/colorWhite"
-                android:textSize="26sp"
+                android:orientation="vertical"
                 app:layout_constraintBottom_toBottomOf="@+id/room_logo"
                 app:layout_constraintStart_toEndOf="@+id/room_logo"
-                app:layout_constraintTop_toTopOf="@+id/room_logo"
-                tools:text="Room Title" />
+                app:layout_constraintTop_toTopOf="@+id/room_logo">
 
+                <TextView
+                    android:id="@+id/room_title"
+                    style="@style/textStandard"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/colorWhite"
+                    android:textSize="22sp"
+                    tools:text="Room Title" />
+
+                <TextView
+                    android:id="@+id/room_members_amount"
+                    style="@style/textInfo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/colorWhite"
+                    android:textSize="16sp"
+                    tools:text="18 members" />
+
+            </LinearLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
-
     </androidx.appcompat.widget.Toolbar>
+
+    <TextView
+        android:id="@+id/floating_header"
+        style="@style/textStandard"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/small_margin"
+        android:background="@drawable/half_transparent_grey_oval"
+        android:elevation="2dp"
+        android:padding="@dimen/small_margin"
+        android:textColor="@color/colorWhite"
+        android:textSize="12sp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/messages_list"
+        tools:text="Jun 17"
+        tools:visibility="visible" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/messages_list"
@@ -86,5 +118,4 @@
             tools:visibility="visible" />
 
     </LinearLayout>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

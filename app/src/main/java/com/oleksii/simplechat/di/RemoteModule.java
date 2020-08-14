@@ -5,6 +5,7 @@ import com.github.nkzawa.socketio.client.Socket;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.oleksii.simplechat.constants.NetworkConstants;
+import com.oleksii.simplechat.utils.ChatAPI;
 
 import java.net.URISyntaxException;
 
@@ -13,6 +14,7 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 @Module
@@ -30,7 +32,14 @@ public class RemoteModule {
         return new Retrofit.Builder()
                 .baseUrl(NetworkConstants.CHAT_SERVER_URL)
                 .addConverterFactory(GsonConverterFactory.create(gson))
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build();
+    }
+
+    @Provides
+    @Singleton
+    ChatAPI provideChatAPI(Retrofit retrofit) {
+        return retrofit.create(ChatAPI.class);
     }
 
     @Provides

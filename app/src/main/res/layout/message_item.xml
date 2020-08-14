@@ -2,59 +2,84 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/linearLayout"
-    android:paddingHorizontal="@dimen/def_margin"
-    android:paddingVertical="2dp"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <com.oleksii.simplechat.customviews.LogoView
-        android:id="@+id/sender_logo"
-        android:layout_width="51dp"
-        android:layout_height="51dp"
-        android:layout_gravity="bottom"
-        android:layout_marginEnd="@dimen/small_margin"
-        tools:text="X" />
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/constraintLayout"
+    <TextView
+        android:id="@+id/date_header"
+        style="@style/textStandard"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_margin="@dimen/small_margin"
+        android:background="@drawable/half_transparent_grey_oval"
+        android:elevation="2dp"
+        android:padding="@dimen/small_margin"
+        android:textColor="@color/colorWhite"
+        android:textSize="12sp"
+        android:visibility="gone"
+        android:layout_gravity="center_horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/messages_list"
+        tools:text="Jun 17"
+        tools:visibility="visible" />
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
         android:paddingHorizontal="@dimen/def_margin"
-        android:paddingVertical="@dimen/small_margin"
-        tools:background="@drawable/user_message_box">
+        android:paddingVertical="2dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-        <TextView
-            android:id="@+id/sender_name"
-            style="@style/textHighlighted"
+        <com.oleksii.simplechat.customviews.LogoView
+            android:id="@+id/sender_logo"
+            android:layout_width="51dp"
+            android:layout_height="51dp"
+            android:layout_gravity="bottom"
+            android:layout_marginEnd="@dimen/small_margin"
+            tools:text="X" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraintLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/colorPrimary"
-            app:layout_constraintStart_toStartOf="@+id/message_body"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="Alex" />
+            android:paddingHorizontal="@dimen/def_margin"
+            android:paddingVertical="@dimen/small_margin"
+            tools:background="@drawable/user_message_box">
 
-        <TextView
-            android:id="@+id/message_body"
-            style="@style/textStandard"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/def_margin"
-            android:maxEms="10"
-            android:textColor="@color/colorWhite"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/sender_name"
-            tools:text="hello, mate! sdfsdfsdfsdfsdfsdsdfsdsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsfsdfsdfsdfdsfs" />
+            <TextView
+                android:id="@+id/sender_name"
+                style="@style/textHighlighted"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/colorPrimary"
+                app:layout_constraintStart_toStartOf="@+id/message_body"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="Alex" />
 
-        <TextView
-            android:id="@+id/sending_time"
-            style="@style/textInfo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/def_margin"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/message_body"
-            tools:text="13:30" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <TextView
+                android:id="@+id/message_body"
+                style="@style/textStandard"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/def_margin"
+                android:maxEms="10"
+                android:textColor="@color/colorWhite"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/sender_name"
+                tools:text="hello, mate!" />
+
+            <TextView
+                android:id="@+id/sending_time"
+                style="@style/textInfo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/def_margin"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/message_body"
+                tools:text="13:30" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 </LinearLayout>

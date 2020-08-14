@@ -43,19 +43,27 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
+    // Room
     def roomVersion = "2.2.5"
     implementation "androidx.room:room-runtime:$roomVersion"
     annotationProcessor "androidx.room:room-compiler:$roomVersion"
 
+    // Socket.IO
     def socketIoVersion = "0.6.0"
     implementation "com.github.nkzawa:socket.io-client:$socketIoVersion"
 
+    // Retrofit
     def retrofitVersion = '2.9.0'
     implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
     implementation "com.squareup.retrofit2:converter-gson:$retrofitVersion"
 
+    // Lottie animations
     def lottieVersion = "3.4.0"
     implementation "com.airbnb.android:lottie:$lottieVersion"
+
+    // Special EditText for phone number verification
+    def pinEntryEditTextVersion = "2.0.6"
+    implementation ("com.alimuzaffar.lib:pinentryedittext:$pinEntryEditTextVersion")
 
     def navigationVersion = "2.3.0"
     implementation "androidx.navigation:navigation-fragment:$navigationVersion"
@@ -68,8 +76,24 @@ dependencies {
     api "com.google.dagger:dagger-android:$daggerVersion"
     annotationProcessor "com.google.dagger:dagger-android-processor:$daggerVersion"
 
+    // RxAndroid
+    def rxAndroidVersion = '2.1.1'
+    implementation "io.reactivex.rxjava2:rxandroid:$rxAndroidVersion"
+
+    // RxJava
+    def rxJavaVersion = '2.1.1'
+    implementation "io.reactivex.rxjava2:rxjava:$rxJavaVersion"
+
+    // Rx-Retrofit Call Adapter
+    def rxCallAdapterVersion = '2.5.0'
+    implementation "com.squareup.retrofit2:adapter-rxjava2:$rxCallAdapterVersion"
+
+    // RxBinding
+    def rxBindingVersion = '4.0.0'
+    implementation "com.jakewharton.rxbinding4:rxbinding:$rxBindingVersion"
+    implementation "com.jakewharton.rxbinding4:rxbinding-recyclerview:$rxBindingVersion"
+
+    // Firebase
     implementation 'com.google.firebase:firebase-auth:19.3.2'
     implementation 'com.google.android.gms:play-services-auth:18.1.0'
-
-    implementation ('com.alimuzaffar.lib:pinentryedittext:2.0.6')
 }

@@ -2,6 +2,7 @@ package com.oleksii.simplechat.viewmodels;
 
 import android.util.Log;
 
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
@@ -12,26 +13,30 @@ import com.oleksii.simplechat.di.AppComponent;
 import com.oleksii.simplechat.di.DaggerAppComponent;
 import com.oleksii.simplechat.models.NewRoom;
 import com.oleksii.simplechat.models.User;
-import com.oleksii.simplechat.utils.IRest;
+import com.oleksii.simplechat.utils.ChatAPI;
 
 import java.util.LinkedList;
+import java.util.List;
 
 import javax.inject.Inject;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import io.reactivex.SingleObserver;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 import retrofit2.Retrofit;
 
 public class NewGroupViewModel extends ViewModel {
 
     private final String TAG = this.getClass().getName();
+    private MutableLiveData<List<User>> availableUsers = new MutableLiveData<>();
+    private MutableLiveData<List<User>> checkedUsers = new MutableLiveData<>();
+    private String roomTitle = "";
     @Inject Socket mSocket;
+    @Inject ChatAPI chatAPI;
     @Inject Retrofit retrofit;
-    public MutableLiveData<LinkedList<User>> availableUsers = new MutableLiveData<>();
-    public MutableLiveData<LinkedList<User>> checkedUsers = new MutableLiveData<>();
 
     public NewGroupViewModel() {
+        availableUsers.setValue(new LinkedList<>());
         checkedUsers.setValue(new LinkedList<>());
 
         AppComponent appComponent = DaggerAppComponent.create();
@@ -41,46 +46,54 @@ public class NewGroupViewModel extends ViewModel {
     }
 
     private void init() {
-        IRest userRest = retrofit.create(IRest.class);
-        Call<LinkedList<User>> call = userRest.getAvailableUsers(
-                FirebaseAuth.getInstance().getUid() + "/getUsers");
+        chatAPI.getAvailableUsers(FirebaseAuth.getInstance().getUid())
+                .subscribeOn(Schedulers.newThread())
+                .subscribe(new SingleObserver<List<User>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) { }
 
-        call.enqueue(new Callback<LinkedList<User>>() {
-            @Override
-            public void onResponse(Call<LinkedList<User>> call, Response<LinkedList<User>> response) {
-                if (!response.isSuccessful()) {
-                    return;
-                }
+                    @Override
+                    public void onSuccess(List<User> users) {
+                        availableUsers.postValue(users);
+                    }
 
-                LinkedList<User> users = response.body();
-                availableUsers.setValue(users);
-            }
-
-            @Override
-            public void onFailure(Call<LinkedList<User>> call, Throwable t) {
-                Log.e(TAG, t.getMessage());
-            }
-        });
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.e(TAG, e.getMessage());
+                    }
+                });
     }
 
     public void addCheckedUser(User user) {
-        LinkedList<User> tmp = checkedUsers.getValue();
+        List<User> tmp = checkedUsers.getValue();
         tmp.add(user);
         checkedUsers.setValue(tmp);
     }
 
     public void removeCheckedUser(User user) {
-        LinkedList<User> tmp = checkedUsers.getValue();
+        List<User> tmp = checkedUsers.getValue();
         tmp.remove(user);
         checkedUsers.setValue(tmp);
     }
 
-    public LinkedList<User> getCheckedUsers() {
-        return checkedUsers.getValue();
+    public void createNewGroup() {
+        mSocket.emit("onNewGroupCreated", new Gson()
+                .toJson(new NewRoom(roomTitle, checkedUsers.getValue())));
     }
 
-    public void createNewGroup(String title) {
-        mSocket.emit("onNewGroupCreated", new Gson()
-                .toJson(new NewRoom(title, checkedUsers.getValue())));
+    public LiveData<List<User>> getAvailableUsers() {
+        return availableUsers;
+    }
+
+    public LiveData<List<User>> getCheckedUsers() {
+        return checkedUsers;
+    }
+
+    public String getRoomTitle() {
+        return roomTitle;
+    }
+
+    public void setRoomTitle(String roomTitle) {
+        this.roomTitle = roomTitle;
     }
 }

@@ -9,8 +9,6 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,10 +17,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.jakewharton.rxbinding4.widget.RxTextView;
 import com.oleksii.simplechat.R;
 import com.oleksii.simplechat.adapters.UsersListAdapter;
 import com.oleksii.simplechat.customviews.LogoView;
 import com.oleksii.simplechat.viewmodels.NewGroupViewModel;
+
+import java.util.concurrent.TimeUnit;
+
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 
 public class FinallyCreateGroupFragment extends Fragment {
 
@@ -31,8 +34,8 @@ public class FinallyCreateGroupFragment extends Fragment {
     private LogoView roomLogo;
     private TextView membersText;
     private RecyclerView usersListRecycler;
-    private UsersListAdapter mAdapter;
-    private NewGroupViewModel newGroupViewModel;
+    private UsersListAdapter mAdapter = new UsersListAdapter();;
+    private NewGroupViewModel viewModel;
     private FloatingActionButton fab;
 
     public FinallyCreateGroupFragment() { }
@@ -64,9 +67,9 @@ public class FinallyCreateGroupFragment extends Fragment {
     }
 
     private void setupViewModel() {
-        newGroupViewModel = new ViewModelProvider(requireActivity())
+        viewModel = new ViewModelProvider(requireActivity())
                 .get(NewGroupViewModel.class);
-        newGroupViewModel.checkedUsers.observe(getViewLifecycleOwner(), list -> {
+        viewModel.getCheckedUsers().observe(getViewLifecycleOwner(), list -> {
             String str = list.size() + " ";
             if (list.size() > 1) {
                 str += getString(R.string.members);
@@ -80,35 +83,32 @@ public class FinallyCreateGroupFragment extends Fragment {
     }
 
     private void setupUsersListRecycler() {
+        mAdapter.enableTickIndicators(false);
         usersListRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
-        mAdapter = new UsersListAdapter(newGroupViewModel, false);
         usersListRecycler.setAdapter(mAdapter);
     }
 
     private void setupRoomTitleText() {
-        roomTitleText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+        roomTitleText.setText(viewModel.getRoomTitle());
+        RxTextView.textChanges(roomTitleText)
+                .debounce(200, TimeUnit.MILLISECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(input -> {
+                    if (input.length() > 0) {
+                        roomLogo.setVisibility(View.VISIBLE);
+                        roomLogo.addText(input.toString());
+                    } else {
+                        roomLogo.setVisibility(View.INVISIBLE);
+                    }
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (s.length() > 0) {
-                    roomLogo.setVisibility(View.VISIBLE);
-                    roomLogo.addText(s.toString());
-                } else {
-                    roomLogo.setVisibility(View.INVISIBLE);
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) { }
-        });
+                    viewModel.setRoomTitle(input.toString().trim());
+                });
     }
 
     private void setupFab() {
         fab.setOnClickListener(v -> {
             if (!roomTitleText.getText().toString().trim().isEmpty()) {
-                newGroupViewModel.createNewGroup(roomTitleText.getText().toString().trim());
+                viewModel.createNewGroup();
                 requireActivity().finish();
             } else {
                 Toast.makeText(getContext(), getString(R.string.enter_group_name_first),

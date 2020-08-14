@@ -31,7 +31,7 @@ public class RoomsListFragment extends Fragment {
     private Toolbar toolbar;
     private RecyclerView roomsListRecycler;
     private RoomsListAdapter mAdapter = new RoomsListAdapter();;
-    private RoomsListViewModel roomsListViewModel;
+    private RoomsListViewModel viewModel;
     private MainActivity parentActivity;
     @Inject Socket mSocket;
 
@@ -66,8 +66,8 @@ public class RoomsListFragment extends Fragment {
     }
 
     private void setupViewModel() {
-        roomsListViewModel = new ViewModelProvider(requireActivity()).get(RoomsListViewModel.class);
-        roomsListViewModel.availableRooms.observe(getViewLifecycleOwner(), mAdapter::submitAll);
+        viewModel = new ViewModelProvider(requireActivity()).get(RoomsListViewModel.class);
+        viewModel.getAvailableRooms().observe(getViewLifecycleOwner(), mAdapter::submitAll);
     }
 
     private void setupToolbar() {

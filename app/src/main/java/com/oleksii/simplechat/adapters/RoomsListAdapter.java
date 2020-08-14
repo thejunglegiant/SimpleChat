@@ -14,18 +14,18 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.oleksii.simplechat.R;
 import com.oleksii.simplechat.customviews.LogoView;
 import com.oleksii.simplechat.models.ListRoom;
-import com.oleksii.simplechat.utils.Util;
+import com.oleksii.simplechat.utils.DateUtil;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 public class RoomsListAdapter extends RecyclerView.Adapter<RoomsListAdapter.ViewHolder> {
 
-    private LinkedList<ListRoom> mRoomsList = new LinkedList<>();
+    private List<ListRoom> mRoomsList = new LinkedList<>();
 
     public RoomsListAdapter() { }
 
-    public void submitAll(LinkedList<ListRoom> list) {
+    public void submitAll(List<ListRoom> list) {
         mRoomsList.clear();
         mRoomsList.addAll(list);
         notifyDataSetChanged();
@@ -76,7 +76,7 @@ public class RoomsListAdapter extends RecyclerView.Adapter<RoomsListAdapter.View
                 lastMessageTime.setVisibility(View.VISIBLE);
                 whoSent.setText(listRoom.getFirstname() + ": ");
                 lastMessage.setText(listRoom.getLastMessage());
-                lastMessageTime.setText(Util.getTimeString(listRoom.getLastActivity(), false));
+                lastMessageTime.setText(DateUtil.getDateString(listRoom.getLastActivity(), false));
             }
 
             mainLayout.setOnClickListener(v -> {

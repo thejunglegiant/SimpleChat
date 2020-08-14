@@ -8,6 +8,7 @@ public class Message {
 
     private String userId;
     private long roomId;
+    private String roomTitle;
     @SerializedName("issender")
     private boolean isSender;
     private String firstname;
@@ -22,11 +23,12 @@ public class Message {
         this.body = body;
     }
 
-    public Message(String firstname, String lastname, String body, Timestamp sendingTime) {
+    public Message(long roomId, String roomTitle, String firstname, String lastname, String body) {
+        this.roomId = roomId;
+        this.roomTitle = roomTitle;
         this.firstname = firstname;
         this.lastname = lastname;
         this.body = body;
-        this.sendingTime = sendingTime;
     }
 
     public Message(boolean isSender, String firstname, String lastname, String body, Timestamp stime) {
@@ -91,5 +93,13 @@ public class Message {
 
     public void setSendingTime(Timestamp sendingTime) {
         this.sendingTime = sendingTime;
+    }
+
+    public String getRoomTitle() {
+        return roomTitle;
+    }
+
+    public void setRoomTitle(String roomTitle) {
+        this.roomTitle = roomTitle;
     }
 }

@@ -11,5 +11,6 @@ public class NetworkConstants {
 
 //    public static final String CHAT_SERVER_URL = "http://10.0.2.2:3000/";
     public static final String CHAT_SERVER_URL = "https://simple-chat-oleksii.herokuapp.com/";
+
     public static final String NEW_MESSAGES_CHANNEL_ID = "new_messages_channel_id";
 }

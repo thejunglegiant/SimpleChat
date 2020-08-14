@@ -11,6 +11,7 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -22,12 +23,19 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.jakewharton.rxbinding4.recyclerview.RecyclerViewScrollEvent;
+import com.jakewharton.rxbinding4.recyclerview.RxRecyclerView;
 import com.oleksii.simplechat.activities.MainActivity;
 import com.oleksii.simplechat.R;
 import com.oleksii.simplechat.adapters.MessagesListAdapter;
 import com.oleksii.simplechat.customviews.LogoView;
 import com.oleksii.simplechat.factories.ExactRoomVMFactory;
+import com.oleksii.simplechat.utils.DateUtil;
 import com.oleksii.simplechat.viewmodels.ExactRoomViewModel;
+
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Observer;
+import io.reactivex.rxjava3.disposables.Disposable;
 
 public class ExactRoomFragment extends Fragment {
 
@@ -35,13 +43,14 @@ public class ExactRoomFragment extends Fragment {
     private String roomTitle;
     private MainActivity parentActivity;
     private Toolbar toolbar;
-    private TextView titleText;
+    private TextView titleText, membersText, floatingHeader;
     private LogoView roomLogo;
     private ImageButton sendButton;
     private EditText messageEditText;
+    private LinearLayoutManager layoutManager;
     private RecyclerView messagesListRecycler;
     private MessagesListAdapter mAdapter = new MessagesListAdapter();
-    private ExactRoomViewModel exactRoomViewModel;
+    private ExactRoomViewModel viewModel;
 
     public ExactRoomFragment() { }
 
@@ -67,7 +76,9 @@ public class ExactRoomFragment extends Fragment {
 
         toolbar = rootView.findViewById(R.id.toolbar);
         titleText = rootView.findViewById(R.id.room_title);
+        membersText = rootView.findViewById(R.id.room_members_amount);
         roomLogo = rootView.findViewById(R.id.room_logo);
+        floatingHeader = rootView.findViewById(R.id.floating_header);
         messagesListRecycler = rootView.findViewById(R.id.messages_list);
         sendButton = rootView.findViewById(R.id.send_button);
         messageEditText = rootView.findViewById(R.id.message_box);
@@ -75,9 +86,71 @@ public class ExactRoomFragment extends Fragment {
         setupToolbar();
         setupAdapter();
         setupViewModel();
+        setupFloatingHeader();
         setupMessageBoxSection();
 
         return rootView;
+    }
+
+    private void setupFloatingHeader() {
+        final boolean[] animationAllowed = {false};
+        Animation fadeIn = AnimationUtils.loadAnimation(getContext(), R.anim.fade_in);
+        Animation fadeOut = AnimationUtils.loadAnimation(getContext(), R.anim.fade_out);
+        Handler handler = new Handler();
+        Runnable runnable = () -> floatingHeader.startAnimation(fadeOut);
+        fadeIn.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+                floatingHeader.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) { }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) { }
+        });
+        fadeOut.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) { }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                floatingHeader.setVisibility(View.GONE);
+                animationAllowed[0] = true;
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) { }
+        });
+        RxRecyclerView.scrollEvents(messagesListRecycler)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<RecyclerViewScrollEvent>() {
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) { }
+
+                    @Override
+                    public void onNext(@NonNull RecyclerViewScrollEvent recyclerViewScrollEvent) {
+                        floatingHeader.setText(DateUtil.getDayMonthString(
+                                viewModel.getMessagesList().getValue().get(layoutManager
+                                        .findFirstVisibleItemPosition()).getSendingTime()));
+
+                        handler.removeCallbacks(runnable);
+                        if (animationAllowed[0]
+                                && layoutManager.findLastVisibleItemPosition()
+                                < viewModel.getMessagesList().getValue().size() - 1) {
+                            animationAllowed[0] = false;
+                            floatingHeader.startAnimation(fadeIn);
+                        }
+                        handler.postDelayed(runnable, 500);
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) { }
+
+                    @Override
+                    public void onComplete() { }
+                });
     }
 
     private void setupToolbar() {
@@ -88,7 +161,7 @@ public class ExactRoomFragment extends Fragment {
     }
 
     private void setupAdapter() {
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        layoutManager = new LinearLayoutManager(getContext());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         layoutManager.setStackFromEnd(true);
         layoutManager.setSmoothScrollbarEnabled(false);
@@ -99,11 +172,14 @@ public class ExactRoomFragment extends Fragment {
     private void setupViewModel() {
         ExactRoomVMFactory factory = new ExactRoomVMFactory(roomId, parentActivity.getFirstname(),
                 parentActivity.getLastname(), getContext());
-        exactRoomViewModel = new ViewModelProvider(requireActivity(), factory)
-                .get(ExactRoomViewModel.class);
-        exactRoomViewModel.messages.observe(getViewLifecycleOwner(), list -> {
+        viewModel = new ViewModelProvider(this, factory).get(ExactRoomViewModel.class);
+        viewModel.getMessagesList().observe(getViewLifecycleOwner(), list -> {
             mAdapter.submitAll(list);
             messagesListRecycler.scrollToPosition(mAdapter.getItemCount() - 1);
+        });
+        viewModel.getMembersAmount().observe(getViewLifecycleOwner(), number -> {
+            String str = number + " " + getString(R.string.members);
+            membersText.setText(str);
         });
     }
 
@@ -112,9 +188,7 @@ public class ExactRoomFragment extends Fragment {
         Animation disappearAnim = AnimationUtils.loadAnimation(getContext(), R.anim.send_button_disappear);
         disappearAnim.setAnimationListener(new Animation.AnimationListener() {
             @Override
-            public void onAnimationStart(Animation animation) {
-
-            }
+            public void onAnimationStart(Animation animation) { }
 
             @Override
             public void onAnimationEnd(Animation animation) {
@@ -122,9 +196,7 @@ public class ExactRoomFragment extends Fragment {
             }
 
             @Override
-            public void onAnimationRepeat(Animation animation) {
-
-            }
+            public void onAnimationRepeat(Animation animation) { }
         });
         messageEditText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -144,11 +216,8 @@ public class ExactRoomFragment extends Fragment {
             public void afterTextChanged(Editable s) { }
         });
         sendButton.setOnClickListener(v -> {
-            String message = messageEditText.getText().toString().trim();
-            if (!message.isEmpty()) {
-                exactRoomViewModel.sendMessage(message);
-                messageEditText.setText("");
-            }
+            viewModel.sendMessage(messageEditText.getText().toString().trim());
+            messageEditText.setText("");
         });
     }
 }

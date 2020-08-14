@@ -4,6 +4,7 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.util.Log;
 
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
@@ -14,32 +15,37 @@ import com.google.gson.Gson;
 import com.oleksii.simplechat.constants.NetworkConstants;
 import com.oleksii.simplechat.di.AppComponent;
 import com.oleksii.simplechat.di.DaggerAppComponent;
+import com.oleksii.simplechat.models.ExactRoom;
 import com.oleksii.simplechat.models.Message;
-import com.oleksii.simplechat.utils.IRest;
+import com.oleksii.simplechat.utils.ChatAPI;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.sql.Timestamp;
+import java.util.Calendar;
 import java.util.LinkedList;
+import java.util.List;
 
 import javax.inject.Inject;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import io.reactivex.SingleObserver;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 import retrofit2.Retrofit;
 
 public class ExactRoomViewModel extends ViewModel {
 
     private static final String TAG = "ExactRoomViewModel";
-    public MutableLiveData<LinkedList<Message>> messages = new MutableLiveData<>();
+    private MutableLiveData<List<Message>> messagesList = new MutableLiveData<>();
+    private MutableLiveData<Integer> membersAmount = new MutableLiveData<>();
     private long roomId;
     private String firstname;
     private String lastname;
-    @Inject Socket mSocket;
-    @Inject Retrofit retrofit;
     @Inject Gson gson;
+    @Inject Socket mSocket;
+    @Inject ChatAPI chatAPI;
+    @Inject Retrofit retrofit;
     // Temporary
     NotificationManager notificationManager;
 
@@ -65,26 +71,25 @@ public class ExactRoomViewModel extends ViewModel {
     }
 
     private void init() {
-        messages.setValue(new LinkedList<>());
+        messagesList.setValue(new LinkedList<>());
+
         mSocket.on(NetworkConstants.NEW_MESSAGE_EVENT_ID, onNewMessageReceived);
 
-        IRest IRest = retrofit.create(com.oleksii.simplechat.utils.IRest.class);
-        Call<LinkedList<Message>> call = IRest.getAllRoomMessages(
-                FirebaseAuth.getInstance().getUid() + "/" + roomId + "/getMessages"
-        );
+        chatAPI.getExactRoomInfo(FirebaseAuth.getInstance().getUid(), roomId)
+                .subscribeOn(Schedulers.newThread())
+                .subscribe(new SingleObserver<ExactRoom>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {  }
 
-        call.enqueue(new Callback<LinkedList<Message>>() {
-            @Override
-            public void onResponse(Call<LinkedList<Message>> call, Response<LinkedList<Message>> response) {
-                if (response.isSuccessful() && response.body() != null)
-                    messages.setValue(response.body());
-            }
+                    @Override
+                    public void onSuccess(ExactRoom exactRoom) {
+                        membersAmount.postValue(exactRoom.getMembers());
+                        messagesList.postValue(exactRoom.getMessages());
+                    }
 
-            @Override
-            public void onFailure(Call<LinkedList<Message>> call, Throwable t) {
-                Log.e(TAG, t.getMessage());
-            }
-        });
+                    @Override
+                    public void onError(Throwable e) { Log.e(TAG, e.getMessage()); }
+                });
 
     }
 
@@ -105,10 +110,18 @@ public class ExactRoomViewModel extends ViewModel {
         }
     };
 
+    public LiveData<List<Message>> getMessagesList() {
+        return this.messagesList;
+    }
+
+    public LiveData<Integer> getMembersAmount() {
+        return this.membersAmount;
+    }
+
     public void addMessage(Message message) {
-        LinkedList<Message> tmp = messages.getValue();
+        List<Message> tmp = messagesList.getValue();
         tmp.add(message);
-        messages.postValue(tmp);
+        messagesList.postValue(tmp);
     }
 
     public void sendMessage(String message) {

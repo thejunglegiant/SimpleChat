@@ -1,5 +1,6 @@
 package com.oleksii.simplechat.viewmodels;
 
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
@@ -10,23 +11,25 @@ import com.oleksii.simplechat.constants.NetworkConstants;
 import com.oleksii.simplechat.di.AppComponent;
 import com.oleksii.simplechat.di.DaggerAppComponent;
 import com.oleksii.simplechat.models.ListRoom;
-import com.oleksii.simplechat.utils.IRest;
+import com.oleksii.simplechat.utils.ChatAPI;
 
 import java.util.LinkedList;
+import java.util.List;
 
 import javax.inject.Inject;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import io.reactivex.SingleObserver;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 import retrofit2.Retrofit;
 
 public class RoomsListViewModel extends ViewModel {
 
     private static final String TAG = RoomsListViewModel.class.getName();
-    public final MutableLiveData<LinkedList<ListRoom>> availableRooms = new MutableLiveData<>();
-    @Inject Retrofit retrofit;
+    private final MutableLiveData<List<ListRoom>> availableRooms = new MutableLiveData<>();
     @Inject Socket mSocket;
+    @Inject ChatAPI chatAPI;
+    @Inject Retrofit retrofit;
 
     public RoomsListViewModel() {
         init();
@@ -45,26 +48,20 @@ public class RoomsListViewModel extends ViewModel {
     }
 
     private void updateRoomsList() {
-        IRest IRest = retrofit.create(com.oleksii.simplechat.utils.IRest.class);
-        Call<LinkedList<ListRoom>> call = IRest.getAvailableRooms(
-                FirebaseAuth.getInstance().getUid() + "/getRooms");
+        chatAPI.getAvailableRooms(FirebaseAuth.getInstance().getUid())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new SingleObserver<List<ListRoom>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) { }
 
-        call.enqueue(new Callback<LinkedList<ListRoom>>() {
-            @Override
-            public void onResponse(Call<LinkedList<ListRoom>> call, Response<LinkedList<ListRoom>> response) {
-                if (!response.isSuccessful()) {
-                    return;
-                }
+                    @Override
+                    public void onSuccess(List<ListRoom> listRooms) {
+                        availableRooms.postValue(listRooms);
+                    }
 
-                LinkedList<ListRoom> rooms = response.body();
-                availableRooms.setValue(rooms);
-            }
-
-            @Override
-            public void onFailure(Call<LinkedList<ListRoom>> call, Throwable t) {
-
-            }
-        });
+                    @Override
+                    public void onError(Throwable e) { }
+                });
     }
 
     private Emitter.Listener onInfoChanged = new Emitter.Listener() {
@@ -73,4 +70,8 @@ public class RoomsListViewModel extends ViewModel {
             updateRoomsList();
         }
     };
+
+    public LiveData<List<ListRoom>> getAvailableRooms() {
+        return this.availableRooms;
+    }
 }

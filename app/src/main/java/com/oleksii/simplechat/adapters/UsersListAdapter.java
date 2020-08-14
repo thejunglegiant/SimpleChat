@@ -11,30 +11,37 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.oleksii.simplechat.R;
+import com.oleksii.simplechat.adapters.delegates.TickDelegate;
 import com.oleksii.simplechat.customviews.LogoView;
-import com.oleksii.simplechat.viewmodels.NewGroupViewModel;
 import com.oleksii.simplechat.models.User;
-import com.oleksii.simplechat.utils.Util;
+import com.oleksii.simplechat.utils.DateUtil;
 
 import java.util.LinkedList;
+import java.util.List;
 
 public class UsersListAdapter extends RecyclerView.Adapter<UsersListAdapter.ViewHolder> {
 
-    private LinkedList<User> mUsersList = new LinkedList<>();
-    private NewGroupViewModel viewModel;
-    private Boolean withTickIndicators;
+    private List<User> mUsersList = new LinkedList<>();
+    private List<User> mCheckedUsers = new LinkedList<>();
+    private TickDelegate delegate;
+    private Boolean withTickIndicators = false;
 
-    public UsersListAdapter(NewGroupViewModel viewModel) {
-        this.viewModel = viewModel;
-        this.withTickIndicators = true;
+    public void attachDelegate(TickDelegate delegate) {
+        this.delegate = delegate;
     }
 
-    public UsersListAdapter(NewGroupViewModel viewModel, Boolean withTickIndicators) {
-        this.viewModel = viewModel;
+    public void enableTickIndicators(Boolean withTickIndicators) {
         this.withTickIndicators = withTickIndicators;
     }
 
-    public void submitAll(LinkedList<User> list) {
+    public void setCheckedUsers(List<User> list) {
+        mCheckedUsers.clear();
+        mCheckedUsers.addAll(list);
+    }
+
+    public UsersListAdapter() { }
+
+    public void submitAll(List<User> list) {
         mUsersList.clear();
         mUsersList.addAll(list);
         notifyDataSetChanged();
@@ -44,12 +51,12 @@ public class UsersListAdapter extends RecyclerView.Adapter<UsersListAdapter.View
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.user_item, parent, false);
-        return new ViewHolder(v);
+        return new ViewHolder(v, delegate);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.bind(mUsersList.get(position), withTickIndicators, viewModel);
+        holder.bind(mUsersList.get(position), withTickIndicators, mCheckedUsers);
     }
 
     @Override
@@ -62,8 +69,9 @@ public class UsersListAdapter extends RecyclerView.Adapter<UsersListAdapter.View
         LogoView logoView;
         ImageView tickIndicator;
         ConstraintLayout actualLayout;
+        TickDelegate delegate;
 
-        public ViewHolder(@NonNull View itemView) {
+        public ViewHolder(@NonNull View itemView, TickDelegate delegate) {
             super(itemView);
 
             userName = itemView.findViewById(R.id.user_name);
@@ -71,29 +79,33 @@ public class UsersListAdapter extends RecyclerView.Adapter<UsersListAdapter.View
             logoView = itemView.findViewById(R.id.user_logo);
             tickIndicator = itemView.findViewById(R.id.tick_indicator);
             actualLayout = itemView.findViewById(R.id.actual_layout);
+
+            this.delegate = delegate;
         }
 
-        public void bind(User user, Boolean withTickIndicators, NewGroupViewModel viewModel) {
+        public void bind(User user, Boolean withTickIndicators, List<User> checkedUsers) {
             String nameStr = user.getFirstname() + " " + user.getLastname();
-            String sessionStr = Util.getTimeString(user.getLastSession(), true);
+            String sessionStr = DateUtil.getDateString(user.getLastSession(), true);
 
             logoView.addText(nameStr);
             userName.setText(nameStr);
             lastSeenTime.setText(sessionStr);
             if (withTickIndicators) {
+                // If the client wants to edit the list of users
+                if (checkedUsers.contains(user))
+                    tickIndicator.setVisibility(View.VISIBLE);
+                else
+                    tickIndicator.setVisibility(View.GONE);
+
                 actualLayout.setOnClickListener(v -> {
                     if (tickIndicator.getVisibility() == View.VISIBLE) {
+                        delegate.unCheckUser(user);
                         tickIndicator.setVisibility(View.GONE);
-                        viewModel.removeCheckedUser(user);
                     } else {
+                        delegate.checkUser(user);
                         tickIndicator.setVisibility(View.VISIBLE);
-                        viewModel.addCheckedUser(user);
                     }
                 });
-
-                if (viewModel.getCheckedUsers().contains(user)) {
-                    tickIndicator.setVisibility(View.VISIBLE);
-                }
             }
         }
     }

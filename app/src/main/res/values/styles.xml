@@ -30,17 +30,17 @@
 
     <style name="textStandard">
         <item name="android:fontFamily">@font/roboto_regular</item>
-        <item name="android:textSize">18sp</item>
+        <item name="android:textSize">16sp</item>
     </style>
 
     <style name="textInfo">
         <item name="android:fontFamily">@font/roboto_light</item>
-        <item name="android:textSize">14sp</item>
+        <item name="android:textSize">12sp</item>
     </style>
 
     <style name="textHighlighted">
         <item name="android:fontFamily">@font/roboto_medium</item>
-        <item name="android:textSize">20sp</item>
+        <item name="android:textSize">18sp</item>
         <item name="android:textColor">@color/colorBlack</item>
     </style>
 
