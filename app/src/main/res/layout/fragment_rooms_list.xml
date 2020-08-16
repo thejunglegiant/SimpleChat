@@ -15,26 +15,6 @@
         app:navigationIcon="@drawable/menu_ic"
         app:popupTheme="@style/AppTheme.PopupOverlay" />
 
-<!--    <LinearLayout-->
-<!--        android:id="@+id/connection_alert"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_margin="@dimen/def_margin"-->
-<!--        android:background="@drawable/connection_alert"-->
-<!--        android:padding="@dimen/def_margin"-->
-<!--        android:visibility="gone"-->
-<!--        app:layout_constraintTop_toBottomOf="@+id/toolbar"-->
-<!--        tools:visibility="visible">-->
-
-<!--        <TextView-->
-<!--            style="@style/textStandard"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:text="@string/network_unavailable"-->
-<!--            android:textColor="@color/whiteGray" />-->
-
-<!--    </LinearLayout>-->
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rooms_list"
         android:layout_width="match_parent"

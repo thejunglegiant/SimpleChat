@@ -49,7 +49,7 @@ public class EventsService extends Service {
                 .toJson(new User(FirebaseAuth.getInstance().getUid(), firstname, lastname)));
         mSocket.on(NetworkConstants.SYNCED_EVENT_ID, synced);
         mSocket.on(NetworkConstants.RECONNECT_EVENT_ID, onReconnectEvent);
-        mSocket.on(NetworkConstants.NEW_MESSAGE_EVENT_ID, onNewMessageReceived);
+        mSocket.on(NetworkConstants.NEW_MESSAGE_RECEIVED_EVENT_ID, onNewMessageReceived);
     }
 
     private Emitter.Listener synced = new Emitter.Listener() {

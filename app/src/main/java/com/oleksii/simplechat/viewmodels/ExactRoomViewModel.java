@@ -23,7 +23,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.sql.Timestamp;
-import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -38,7 +37,7 @@ public class ExactRoomViewModel extends ViewModel {
 
     private static final String TAG = "ExactRoomViewModel";
     private MutableLiveData<List<Message>> messagesList = new MutableLiveData<>();
-    private MutableLiveData<Integer> membersAmount = new MutableLiveData<>();
+    private MutableLiveData<Integer> membersCount = new MutableLiveData<>();
     private long roomId;
     private String firstname;
     private String lastname;
@@ -52,7 +51,7 @@ public class ExactRoomViewModel extends ViewModel {
     @Override
     protected void onCleared() {
         super.onCleared();
-        mSocket.off(NetworkConstants.NEW_MESSAGE_EVENT_ID, onNewMessageReceived);
+        mSocket.off(NetworkConstants.NEW_MESSAGE_RECEIVED_EVENT_ID, onNewMessageReceived);
     }
 
     public ExactRoomViewModel(long roomId, String firstname, String lastname, Context context) {
@@ -73,7 +72,8 @@ public class ExactRoomViewModel extends ViewModel {
     private void init() {
         messagesList.setValue(new LinkedList<>());
 
-        mSocket.on(NetworkConstants.NEW_MESSAGE_EVENT_ID, onNewMessageReceived);
+        mSocket.on(NetworkConstants.NEW_MESSAGE_RECEIVED_EVENT_ID, onNewMessageReceived);
+        mSocket.on(NetworkConstants.SOMEONE_LEFT_GROUP_EVENT_ID, onSomeoneLeftGroup);
 
         chatAPI.getExactRoomInfo(FirebaseAuth.getInstance().getUid(), roomId)
                 .subscribeOn(Schedulers.newThread())
@@ -83,8 +83,12 @@ public class ExactRoomViewModel extends ViewModel {
 
                     @Override
                     public void onSuccess(ExactRoom exactRoom) {
-                        membersAmount.postValue(exactRoom.getMembers());
+                        membersCount.postValue(exactRoom.getMembers());
                         messagesList.postValue(exactRoom.getMessages());
+
+                        for (Message item : exactRoom.getMessages()) {
+                            Log.e(TAG, item.getFirstname() + " " + item.getLastname() + ": " + item.getBody() + " - " + item.getViewType());
+                        }
                     }
 
                     @Override
@@ -100,7 +104,7 @@ public class ExactRoomViewModel extends ViewModel {
                 Message message = new Message(data.getString("firstname").equals(this.firstname)
                         && data.getString("lastname").equals(this.lastname),
                         data.getString("firstname"), data.getString("lastname"), data.getString("body"),
-                        new Timestamp(data.getLong("stime")));
+                        new Timestamp(data.getLong("stime")), data.getInt("viewtype"));
                 this.addMessage(message);
 
                 notificationManager.cancel((int) roomId);
@@ -110,12 +114,28 @@ public class ExactRoomViewModel extends ViewModel {
         }
     };
 
+    private Emitter.Listener onSomeoneLeftGroup = args -> {
+        JSONObject data = (JSONObject) args[0];
+        try {
+            Message message = new Message(data.getString("firstname"), data.getString("lastname"),
+                    new Timestamp(data.getLong("stime")), data.getInt("viewtype"));
+            this.addMessage(message);
+            this.setMembersCount(data.getInt("members"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    };
+
     public LiveData<List<Message>> getMessagesList() {
         return this.messagesList;
     }
 
-    public LiveData<Integer> getMembersAmount() {
-        return this.membersAmount;
+    public LiveData<Integer> getMembersCount() {
+        return this.membersCount;
+    }
+
+    private void setMembersCount(int members) {
+        this.membersCount.postValue(members);
     }
 
     public void addMessage(Message message) {
@@ -127,6 +147,12 @@ public class ExactRoomViewModel extends ViewModel {
     public void sendMessage(String message) {
         Message newMessage = new Message(FirebaseAuth.getInstance().getUid(),
                 roomId, message);
-        mSocket.emit("onNewMessageSent", gson.toJson(newMessage));
+        mSocket.emit(NetworkConstants.NEW_MESSAGE_SENT_EVENT_ID, gson.toJson(newMessage));
+    }
+
+    public void leaveGroup() {
+        Message leaveMessage = new Message(FirebaseAuth.getInstance().getUid(),
+                roomId);
+        mSocket.emit(NetworkConstants.LEAVE_GROUP_EVENT_ID, gson.toJson(leaveMessage));
     }
 }

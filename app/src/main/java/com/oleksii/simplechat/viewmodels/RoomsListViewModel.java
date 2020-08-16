@@ -41,8 +41,9 @@ public class RoomsListViewModel extends ViewModel {
         AppComponent appComponent = DaggerAppComponent.create();
         appComponent.inject(this);
 
-        mSocket.on(NetworkConstants.NEW_MESSAGE_EVENT_ID, onInfoChanged);
+        mSocket.on(NetworkConstants.NEW_MESSAGE_RECEIVED_EVENT_ID, onInfoChanged);
         mSocket.on(NetworkConstants.NEW_GROUP_EVENT_ID, onInfoChanged);
+        mSocket.on(NetworkConstants.YOU_LEFT_GROUP_EVENT_ID, onInfoChanged);
 
         updateRoomsList();
     }
@@ -64,12 +65,7 @@ public class RoomsListViewModel extends ViewModel {
                 });
     }
 
-    private Emitter.Listener onInfoChanged = new Emitter.Listener() {
-        @Override
-        public void call(Object... args) {
-            updateRoomsList();
-        }
-    };
+    private Emitter.Listener onInfoChanged = args -> updateRoomsList();
 
     public LiveData<List<ListRoom>> getAvailableRooms() {
         return this.availableRooms;

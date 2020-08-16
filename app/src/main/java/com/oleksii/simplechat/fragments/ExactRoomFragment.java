@@ -154,8 +154,18 @@ public class ExactRoomFragment extends Fragment {
     }
 
     private void setupToolbar() {
+        toolbar.inflateMenu(R.menu.toolbar_exact_room);
         toolbar.setNavigationOnClickListener(v -> Navigation.findNavController(v)
                 .navigate(R.id.action_exactRoomFragment_to_chatsListFragment));
+        toolbar.setOnMenuItemClickListener(item -> {
+            if (item.getItemId() == R.id.leave_room_button) {
+                viewModel.leaveGroup();
+                Navigation.findNavController(toolbar)
+                        .navigate(R.id.action_exactRoomFragment_to_chatsListFragment);
+                return true;
+            }
+            return super.onOptionsItemSelected(item);
+        });
         titleText.setText(roomTitle);
         roomLogo.addText(roomTitle);
     }
@@ -184,7 +194,7 @@ public class ExactRoomFragment extends Fragment {
             mAdapter.submitAll(list);
             messagesListRecycler.scrollToPosition(mAdapter.getItemCount() - 1);
         });
-        viewModel.getMembersAmount().observe(getViewLifecycleOwner(), number -> {
+        viewModel.getMembersCount().observe(getViewLifecycleOwner(), number -> {
             String str = number + " " + getString(R.string.members);
             membersText.setText(str);
         });

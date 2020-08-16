@@ -28,7 +28,7 @@
     <LinearLayout
         android:id="@+id/linearLayout"
         android:paddingHorizontal="@dimen/def_margin"
-        android:paddingVertical="2dp"
+        android:paddingVertical="@dimen/room_elements_margin"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 

@@ -1,5 +1,6 @@
 package com.oleksii.simplechat.adapters;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -52,6 +53,7 @@ public class RoomsListAdapter extends RecyclerView.Adapter<RoomsListAdapter.View
         TextView title, whoSent, lastMessage, lastMessageTime;
         LogoView logoView;
         ConstraintLayout mainLayout;
+        Context context;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -62,15 +64,26 @@ public class RoomsListAdapter extends RecyclerView.Adapter<RoomsListAdapter.View
             lastMessageTime = itemView.findViewById(R.id.date_time);
             logoView = itemView.findViewById(R.id.room_logo);
             mainLayout = itemView.findViewById(R.id.main_layout);
+            context = itemView.getContext();
         }
 
         void bind(ListRoom listRoom) {
             logoView.addText(listRoom.getTitle());
             title.setText(listRoom.getTitle());
-            if (listRoom.getLastMessage() == null || listRoom.getLastActivity() == null) {
+
+            if (listRoom.getLastMessage() == null) {
                 whoSent.setVisibility(View.GONE);
                 lastMessageTime.setVisibility(View.GONE);
-                lastMessage.setText(R.string.no_messages_yet);
+                switch (listRoom.getMessageViewType()) {
+                    case 0:
+                        lastMessage.setText(R.string.no_messages_yet);
+                        break;
+                    case 1:
+                        String str = listRoom.getFirstname() + " " + listRoom.getLastname() + " "
+                                + context.getString(R.string.left_the_group);
+                        lastMessage.setText(str);
+                        break;
+                }
             } else {
                 whoSent.setVisibility(View.VISIBLE);
                 lastMessageTime.setVisibility(View.VISIBLE);

@@ -9,10 +9,13 @@ public class ListRoom {
     private long id;
     private String title;
     private String firstname;
+    private String lastname;
     @SerializedName("last_message")
     private String lastMessage;
     @SerializedName("stime")
     private Timestamp lastActivity;
+    @SerializedName("message_viewtype")
+    private int messageViewType;
     // For UI purposes
     private Boolean isAttached = false;
     private Boolean hasNewMessages = false;
@@ -83,5 +86,21 @@ public class ListRoom {
 
     public void setHasNewMessages(Boolean hasNewMessages) {
         this.hasNewMessages = hasNewMessages;
+    }
+
+    public int getMessageViewType() {
+        return messageViewType;
+    }
+
+    public void setMessageViewType(int messageViewType) {
+        this.messageViewType = messageViewType;
+    }
+
+    public String getLastname() {
+        return lastname;
+    }
+
+    public void setLastname(String lastname) {
+        this.lastname = lastname;
     }
 }

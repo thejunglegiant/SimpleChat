@@ -5,4 +5,5 @@
     <dimen name="big_margin">32dp</dimen>
     <dimen name="huge_margin">48dp</dimen>
     <dimen name="biggest_margin">64dp</dimen>
+    <dimen name="room_elements_margin">2dp</dimen>
 </resources>

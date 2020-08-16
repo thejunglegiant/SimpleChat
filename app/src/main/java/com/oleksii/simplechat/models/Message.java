@@ -16,6 +16,14 @@ public class Message {
     private String body;
     @SerializedName("stime")
     private Timestamp sendingTime;
+    // 0 - just a regular Message, 1 - someone left group
+    @SerializedName("viewtype")
+    private int viewType;
+
+    public Message(String userId, long roomId) {
+        this.userId = userId;
+        this.roomId = roomId;
+    }
 
     public Message(String userId, long roomId, String body) {
         this.userId = userId;
@@ -23,20 +31,21 @@ public class Message {
         this.body = body;
     }
 
-    public Message(long roomId, String roomTitle, String firstname, String lastname, String body) {
-        this.roomId = roomId;
-        this.roomTitle = roomTitle;
+    public Message(String firstname, String lastname, Timestamp stime, int viewType) {
         this.firstname = firstname;
         this.lastname = lastname;
-        this.body = body;
+        this.sendingTime = stime;
+        this.viewType = viewType;
     }
 
-    public Message(boolean isSender, String firstname, String lastname, String body, Timestamp stime) {
+    public Message(boolean isSender, String firstname, String lastname, String body, Timestamp stime,
+                   int viewType) {
         this.isSender = isSender;
         this.firstname = firstname;
         this.lastname = lastname;
         this.body = body;
         this.sendingTime = stime;
+        this.viewType = viewType;
     }
 
     public String getUserId() {
@@ -101,5 +110,13 @@ public class Message {
 
     public void setRoomTitle(String roomTitle) {
         this.roomTitle = roomTitle;
+    }
+
+    public int getViewType() {
+        return viewType;
+    }
+
+    public void setViewType(int viewType) {
+        this.viewType = viewType;
     }
 }
