@@ -16,8 +16,8 @@ public class MyApplication extends Application {
         super.onCreate();
         createNotificationChannel();
 
-        Intent intent = new Intent(this, EventsService.class);
-        startService(intent);
+//        Intent intent = new Intent(this, EventsService.class);
+//        startService(intent);
     }
 
     private void createNotificationChannel() {

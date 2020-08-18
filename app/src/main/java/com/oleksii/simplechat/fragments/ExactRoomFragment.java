@@ -1,6 +1,7 @@
 package com.oleksii.simplechat.fragments;
 
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -14,24 +15,31 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.jakewharton.rxbinding4.recyclerview.RecyclerViewScrollEvent;
 import com.jakewharton.rxbinding4.recyclerview.RxRecyclerView;
+import com.jakewharton.rxbinding4.widget.RxTextView;
+import com.jakewharton.rxbinding4.widget.TextViewAfterTextChangeEvent;
 import com.oleksii.simplechat.activities.MainActivity;
 import com.oleksii.simplechat.R;
 import com.oleksii.simplechat.adapters.MessagesListAdapter;
 import com.oleksii.simplechat.customviews.LogoView;
 import com.oleksii.simplechat.factories.ExactRoomVMFactory;
 import com.oleksii.simplechat.utils.DateUtil;
+import com.oleksii.simplechat.utils.KeyboardUtil;
 import com.oleksii.simplechat.viewmodels.ExactRoomViewModel;
+
+import java.util.concurrent.TimeUnit;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observer;
@@ -43,7 +51,7 @@ public class ExactRoomFragment extends Fragment {
     private String roomTitle;
     private MainActivity parentActivity;
     private Toolbar toolbar;
-    private TextView titleText, membersText, floatingHeader;
+    private TextView titleText, membersText, floatingHeader, typingText;
     private LogoView roomLogo;
     private ImageButton sendButton;
     private EditText messageEditText;
@@ -78,6 +86,7 @@ public class ExactRoomFragment extends Fragment {
         titleText = rootView.findViewById(R.id.room_title);
         membersText = rootView.findViewById(R.id.room_members_amount);
         roomLogo = rootView.findViewById(R.id.room_logo);
+        typingText = rootView.findViewById(R.id.typing_event_text);
         floatingHeader = rootView.findViewById(R.id.floating_header);
         messagesListRecycler = rootView.findViewById(R.id.messages_list);
         sendButton = rootView.findViewById(R.id.send_button);
@@ -155,19 +164,25 @@ public class ExactRoomFragment extends Fragment {
 
     private void setupToolbar() {
         toolbar.inflateMenu(R.menu.toolbar_exact_room);
-        toolbar.setNavigationOnClickListener(v -> Navigation.findNavController(v)
-                .navigate(R.id.action_exactRoomFragment_to_chatsListFragment));
+        toolbar.setNavigationOnClickListener(v -> {
+            goToMainList();
+        });
         toolbar.setOnMenuItemClickListener(item -> {
             if (item.getItemId() == R.id.leave_room_button) {
                 viewModel.leaveGroup();
-                Navigation.findNavController(toolbar)
-                        .navigate(R.id.action_exactRoomFragment_to_chatsListFragment);
+                goToMainList();
                 return true;
             }
             return super.onOptionsItemSelected(item);
         });
         titleText.setText(roomTitle);
         roomLogo.addText(roomTitle);
+    }
+
+    private void goToMainList() {
+        KeyboardUtil.hideKeyboardFrom(messageEditText);
+        Navigation.findNavController(toolbar)
+                .navigate(R.id.action_exactRoomFragment_to_chatsListFragment);
     }
 
     private void setupAdapter() {
@@ -198,6 +213,30 @@ public class ExactRoomFragment extends Fragment {
             String str = number + " " + getString(R.string.members);
             membersText.setText(str);
         });
+        viewModel.getTypingUser().observe(getViewLifecycleOwner(), name -> {
+            String str = name + " " + getString(R.string.is_typing);
+            startTypingAnimation(str);
+        });
+    }
+
+    private void startTypingAnimation(String str) {
+        Handler handler = new Handler();
+        typingText.setText(str);
+        membersText.setVisibility(View.INVISIBLE);
+        typingText.setVisibility(View.VISIBLE);
+        handler.postDelayed(() -> {
+            typingText.setText(str + ".");
+            handler.postDelayed(() -> {
+                typingText.setText(str + "..");
+                handler.postDelayed(() -> {
+                    typingText.setText(str + "...");
+                    handler.postDelayed(() -> {
+                        membersText.setVisibility(View.VISIBLE);
+                        typingText.setVisibility(View.INVISIBLE);
+                    }, 300);
+                }, 300);
+            }, 300);
+        }, 300);
     }
 
     private void setupMessageBoxSection() {
@@ -232,6 +271,32 @@ public class ExactRoomFragment extends Fragment {
             @Override
             public void afterTextChanged(Editable s) { }
         });
+        RxTextView.textChanges(messageEditText)
+                .debounce(500, TimeUnit.MILLISECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<CharSequence>() {
+                    @Override
+                    public void onSubscribe(@io.reactivex.rxjava3.annotations.NonNull Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(@io.reactivex.rxjava3.annotations.NonNull CharSequence charSequence) {
+                        if (charSequence.length() > 0) {
+                            viewModel.typingEvent();
+                        }
+                    }
+
+                    @Override
+                    public void onError(@io.reactivex.rxjava3.annotations.NonNull Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
         sendButton.setOnClickListener(v -> {
             viewModel.sendMessage(messageEditText.getText().toString().trim());
             messageEditText.setText("");

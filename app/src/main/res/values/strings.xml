@@ -54,4 +54,5 @@
     <string name="channel_description">Messages which were send to you directly from someone or any group.</string>
     <string name="leave_room">Leave room</string>
     <string name="left_the_group">left the group</string>
+    <string name="is_typing">is typing</string>
 </resources>

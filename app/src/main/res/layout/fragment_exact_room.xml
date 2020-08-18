@@ -30,6 +30,7 @@
                 tools:text="a" />
 
             <LinearLayout
+                android:id="@+id/linearLayout2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/def_margin"
@@ -54,9 +55,24 @@
                     android:layout_height="wrap_content"
                     android:textColor="@color/colorWhite"
                     android:textSize="16sp"
-                    tools:text="18 members" />
+                    tools:text="18 members"
+                    tools:visibility="invisible"/>
 
             </LinearLayout>
+
+            <TextView
+                android:id="@+id/typing_event_text"
+                style="@style/textStandard"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/colorWhite"
+                android:textSize="16sp"
+                android:visibility="invisible"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/linearLayout2"
+                tools:text="Alex is typing..."
+                tools:visibility="visible"/>
+
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.appcompat.widget.Toolbar>
 

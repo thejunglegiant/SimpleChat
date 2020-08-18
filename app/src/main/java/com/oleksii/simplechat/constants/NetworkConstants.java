@@ -12,6 +12,7 @@ public class NetworkConstants {
     public static final String LEAVE_GROUP_EVENT_ID = "onLeaveGroup";
     public static final String SOMEONE_LEFT_GROUP_EVENT_ID = "onSomeoneLeftGroup";
     public static final String YOU_LEFT_GROUP_EVENT_ID = "onYouLeftGroup";
+    public static final String TYPING_EVENT_ID = "onTyping";
 
 //    public static final String CHAT_SERVER_URL = "http://10.0.2.2:3000/";
     public static final String CHAT_SERVER_URL = "https://simple-chat-oleksii.herokuapp.com/";

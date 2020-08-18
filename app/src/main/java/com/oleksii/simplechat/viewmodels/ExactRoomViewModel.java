@@ -38,6 +38,7 @@ public class ExactRoomViewModel extends ViewModel {
     private static final String TAG = "ExactRoomViewModel";
     private MutableLiveData<List<Message>> messagesList = new MutableLiveData<>();
     private MutableLiveData<Integer> membersCount = new MutableLiveData<>();
+    private MutableLiveData<String> typingUser = new MutableLiveData<>();
     private long roomId;
     private String firstname;
     private String lastname;
@@ -74,6 +75,7 @@ public class ExactRoomViewModel extends ViewModel {
 
         mSocket.on(NetworkConstants.NEW_MESSAGE_RECEIVED_EVENT_ID, onNewMessageReceived);
         mSocket.on(NetworkConstants.SOMEONE_LEFT_GROUP_EVENT_ID, onSomeoneLeftGroup);
+        mSocket.on(NetworkConstants.TYPING_EVENT_ID, onSomeonesTyping);
 
         chatAPI.getExactRoomInfo(FirebaseAuth.getInstance().getUid(), roomId)
                 .subscribeOn(Schedulers.newThread())
@@ -85,10 +87,6 @@ public class ExactRoomViewModel extends ViewModel {
                     public void onSuccess(ExactRoom exactRoom) {
                         membersCount.postValue(exactRoom.getMembers());
                         messagesList.postValue(exactRoom.getMessages());
-
-                        for (Message item : exactRoom.getMessages()) {
-                            Log.e(TAG, item.getFirstname() + " " + item.getLastname() + ": " + item.getBody() + " - " + item.getViewType());
-                        }
                     }
 
                     @Override
@@ -126,6 +124,22 @@ public class ExactRoomViewModel extends ViewModel {
         }
     };
 
+    private Emitter.Listener onSomeonesTyping = args -> {
+        JSONObject data = (JSONObject) args[0];
+        try {
+            if (roomId == data.getInt("roomId"))
+                this.setTypingUser(data.getString("firstname"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    };
+
+    public void addMessage(Message message) {
+        List<Message> tmp = messagesList.getValue();
+        tmp.add(message);
+        messagesList.postValue(tmp);
+    }
+
     public LiveData<List<Message>> getMessagesList() {
         return this.messagesList;
     }
@@ -138,10 +152,12 @@ public class ExactRoomViewModel extends ViewModel {
         this.membersCount.postValue(members);
     }
 
-    public void addMessage(Message message) {
-        List<Message> tmp = messagesList.getValue();
-        tmp.add(message);
-        messagesList.postValue(tmp);
+    public LiveData<String> getTypingUser() {
+        return typingUser;
+    }
+
+    private void setTypingUser(String typingUser) {
+        this.typingUser.postValue(typingUser);
     }
 
     public void sendMessage(String message) {
@@ -154,5 +170,9 @@ public class ExactRoomViewModel extends ViewModel {
         Message leaveMessage = new Message(FirebaseAuth.getInstance().getUid(),
                 roomId);
         mSocket.emit(NetworkConstants.LEAVE_GROUP_EVENT_ID, gson.toJson(leaveMessage));
+    }
+
+    public void typingEvent() {
+        mSocket.emit("typing", roomId);
     }
 }

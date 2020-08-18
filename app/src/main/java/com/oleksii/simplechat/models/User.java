@@ -20,6 +20,11 @@ public class User {
         this.userId = userId;
     }
 
+    public User(String firstname, String lastname) {
+        this.firstname = firstname;
+        this.lastname = lastname;
+    }
+
     public User(String userId, String firstname, String lastname) {
         this.userId = userId;
         this.firstname = firstname;
