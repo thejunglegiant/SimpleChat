@@ -42,7 +42,7 @@ public class VerifyPhoneNumberFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_verify_phone_number, container, false);
 
-        toolbar = rootView.findViewById(R.id.toolbar);
+        toolbar = rootView.findViewById(R.id.main_toolbar);
         codeVerification = rootView.findViewById(R.id.code_text);
         contactUs = rootView.findViewById(R.id.contact_us);
 

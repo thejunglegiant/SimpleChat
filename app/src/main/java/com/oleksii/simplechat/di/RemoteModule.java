@@ -5,7 +5,7 @@ import com.github.nkzawa.socketio.client.Socket;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.oleksii.simplechat.constants.NetworkConstants;
-import com.oleksii.simplechat.utils.ChatAPI;
+import com.oleksii.simplechat.data.net.ChatAPI;
 
 import java.net.URISyntaxException;
 

@@ -47,7 +47,7 @@ public class EnterPhoneNumberFragment extends Fragment {
 
         View rootView = inflater.inflate(R.layout.fragment_enter_phone_number, container, false);
 
-        toolbar = rootView.findViewById(R.id.toolbar);
+        toolbar = rootView.findViewById(R.id.main_toolbar);
         spinner = rootView.findViewById(R.id.countries_list);
         countryCodeText = rootView.findViewById(R.id.country_code_text);
         phoneNumberText = rootView.findViewById(R.id.phone_number_text);

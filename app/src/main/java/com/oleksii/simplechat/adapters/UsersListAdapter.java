@@ -7,7 +7,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.oleksii.simplechat.R;
@@ -68,7 +67,6 @@ public class UsersListAdapter extends RecyclerView.Adapter<UsersListAdapter.View
         TextView userName, lastSeenTime;
         LogoView logoView;
         ImageView tickIndicator;
-        ConstraintLayout actualLayout;
         TickDelegate delegate;
 
         public ViewHolder(@NonNull View itemView, TickDelegate delegate) {
@@ -78,7 +76,6 @@ public class UsersListAdapter extends RecyclerView.Adapter<UsersListAdapter.View
             lastSeenTime = itemView.findViewById(R.id.last_seen_text);
             logoView = itemView.findViewById(R.id.user_logo);
             tickIndicator = itemView.findViewById(R.id.tick_indicator);
-            actualLayout = itemView.findViewById(R.id.actual_layout);
 
             this.delegate = delegate;
         }
@@ -87,7 +84,7 @@ public class UsersListAdapter extends RecyclerView.Adapter<UsersListAdapter.View
             String nameStr = user.getFirstname() + " " + user.getLastname();
             String sessionStr = DateUtil.getDateString(user.getLastSession(), true);
 
-            logoView.addText(nameStr);
+            logoView.setText(nameStr);
             userName.setText(nameStr);
             lastSeenTime.setText(sessionStr);
             if (withTickIndicators) {
@@ -97,7 +94,7 @@ public class UsersListAdapter extends RecyclerView.Adapter<UsersListAdapter.View
                 else
                     tickIndicator.setVisibility(View.GONE);
 
-                actualLayout.setOnClickListener(v -> {
+                itemView.setOnClickListener(v -> {
                     if (tickIndicator.getVisibility() == View.VISIBLE) {
                         delegate.unCheckUser(user);
                         tickIndicator.setVisibility(View.GONE);

@@ -2,7 +2,6 @@ package com.oleksii.simplechat.adapters;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,10 +15,10 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.oleksii.simplechat.R;
+import com.oleksii.simplechat.adapters.delegates.ClickDelegate;
 import com.oleksii.simplechat.customviews.LogoView;
 import com.oleksii.simplechat.models.Message;
 import com.oleksii.simplechat.utils.DateUtil;
-import com.oleksii.simplechat.viewmodels.ExactRoomViewModel;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -27,6 +26,11 @@ import java.util.List;
 public class MessagesListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private List<Message> mMessagesList = new LinkedList<>();
+    private ClickDelegate delegate;
+
+    public void attachDelegate(ClickDelegate delegate) {
+        this.delegate = delegate;
+    }
 
     public MessagesListAdapter() { }
 
@@ -47,7 +51,7 @@ public class MessagesListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         switch (viewType) {
             case 0:
                 return new RegularViewHolder(LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.message_item, parent, false));
+                        .inflate(R.layout.message_item, parent, false), delegate);
             case 1:
                 return new RoomActionViewHolder(LayoutInflater.from(parent.getContext())
                         .inflate(R.layout.message_action_item, parent, false));
@@ -61,13 +65,11 @@ public class MessagesListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         switch (holder.getItemViewType()) {
             case 0:
-                // Temporary
                 ((RegularViewHolder) holder).bind(mMessagesList.get(position),
                         position - 1 >= 0 ? mMessagesList.get(position - 1) : null,
                         position + 1 < mMessagesList.size() ? mMessagesList.get(position + 1) : null);
                 break;
             case 1:
-                // Temporary (need interfaces)
                 ((RoomActionViewHolder) holder).bind(mMessagesList.get(position));
         }
     }
@@ -102,8 +104,9 @@ public class MessagesListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         TextView header, senderName, messageBody, messageSendingTime;
         Context context;
         Drawable userBox, strangerBox;
+        ClickDelegate delegate;
 
-        public RegularViewHolder(@NonNull View itemView) {
+        public RegularViewHolder(@NonNull View itemView, ClickDelegate delegate) {
             super(itemView);
 
 
@@ -115,6 +118,7 @@ public class MessagesListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             messageBody = itemView.findViewById(R.id.message_body);
             messageSendingTime = itemView.findViewById(R.id.sending_time);
             context = itemView.getContext();
+            this.delegate = delegate;
 
             userBox = ContextCompat.getDrawable(context, R.drawable.user_message_box);
             strangerBox = ContextCompat.getDrawable(context, R.drawable.stranger_message_box);
@@ -137,19 +141,19 @@ public class MessagesListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 constraintLayout.setBackground(strangerBox);
                 linearLayout.setGravity(Gravity.START);
                 senderName.setVisibility(View.VISIBLE);
-                senderLogo.addText(message.getFirstname() + " " + message.getLastname());
+                senderLogo.setText(message.getFirstname() + " " + message.getLastname());
                 senderName.setText(message.getFirstname());
                 messageBody.setTextColor(context.getColor(R.color.colorBlack));
             }
 
-            if (prevMessage != null && prevMessage.getFirstname().equals(message.getFirstname())
+            if (prevMessage != null && prevMessage.getUserId().equals(message.getUserId())
                     || message.isSender()) {
                 senderName.setVisibility(View.GONE);
             } else {
                 senderName.setVisibility(View.VISIBLE);
             }
 
-            if (nextMessage != null && nextMessage.getFirstname().equals(message.getFirstname())
+            if (nextMessage != null && nextMessage.getUserId().equals(message.getUserId())
                     && nextMessage.getViewType() == 0) {
                 senderLogo.setVisibility(View.INVISIBLE);
                 senderLogo.setDpHeight(0);
@@ -163,6 +167,11 @@ public class MessagesListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
             messageBody.setText(message.getBody());
             messageSendingTime.setText(DateUtil.getTimeString(message.getSendingTime()));
+
+            linearLayout.setOnLongClickListener(v -> {
+                delegate.onLongClickEvent(message);
+                return false;
+            });
         }
     }
 }

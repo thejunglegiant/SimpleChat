@@ -55,4 +55,8 @@
     <string name="leave_room">Leave room</string>
     <string name="left_the_group">left the group</string>
     <string name="is_typing">is typing</string>
+    <string name="edit_text">Edit text</string>
+    <string name="copy_text">Copy text`</string>
+    <string name="save_message">Save message</string>
+    <string name="delete_message">Delete message</string>
 </resources>

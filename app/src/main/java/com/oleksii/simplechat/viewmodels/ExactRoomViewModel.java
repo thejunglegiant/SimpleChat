@@ -13,11 +13,13 @@ import com.github.nkzawa.socketio.client.Socket;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.gson.Gson;
 import com.oleksii.simplechat.constants.NetworkConstants;
+import com.oleksii.simplechat.data.SavedMessagesDao;
+import com.oleksii.simplechat.data.entities.SavedMessage;
 import com.oleksii.simplechat.di.AppComponent;
 import com.oleksii.simplechat.di.DaggerAppComponent;
 import com.oleksii.simplechat.models.ExactRoom;
 import com.oleksii.simplechat.models.Message;
-import com.oleksii.simplechat.utils.ChatAPI;
+import com.oleksii.simplechat.data.net.ChatAPI;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -28,6 +30,8 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import io.reactivex.Completable;
+import io.reactivex.CompletableObserver;
 import io.reactivex.SingleObserver;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
@@ -35,13 +39,14 @@ import retrofit2.Retrofit;
 
 public class ExactRoomViewModel extends ViewModel {
 
-    private static final String TAG = "ExactRoomViewModel";
+    private static final String TAG = ExactRoomViewModel.class.getName();
     private MutableLiveData<List<Message>> messagesList = new MutableLiveData<>();
     private MutableLiveData<Integer> membersCount = new MutableLiveData<>();
     private MutableLiveData<String> typingUser = new MutableLiveData<>();
     private long roomId;
     private String firstname;
     private String lastname;
+    private SavedMessagesDao dao;
     @Inject Gson gson;
     @Inject Socket mSocket;
     @Inject ChatAPI chatAPI;
@@ -55,10 +60,12 @@ public class ExactRoomViewModel extends ViewModel {
         mSocket.off(NetworkConstants.NEW_MESSAGE_RECEIVED_EVENT_ID, onNewMessageReceived);
     }
 
-    public ExactRoomViewModel(long roomId, String firstname, String lastname, Context context) {
+    public ExactRoomViewModel(long roomId, String firstname, String lastname, Context context,
+                              SavedMessagesDao dao) {
         this.roomId = roomId;
         this.firstname = firstname;
         this.lastname = lastname;
+        this.dao = dao;
         notificationManager = (NotificationManager) context
                 .getSystemService(Context.NOTIFICATION_SERVICE);
         assert notificationManager != null;
@@ -99,9 +106,10 @@ public class ExactRoomViewModel extends ViewModel {
         JSONObject data = (JSONObject) args[0];
         try {
             if (data.getInt("roomId") == roomId) {
-                Message message = new Message(data.getString("firstname").equals(this.firstname)
-                        && data.getString("lastname").equals(this.lastname),
-                        data.getString("firstname"), data.getString("lastname"), data.getString("body"),
+                Message message = new Message(data.getString("userId")
+                        .equals(FirebaseAuth.getInstance().getUid()),
+                        data.getString("userId"), data.getString("firstname"),
+                        data.getString("lastname"), data.getString("body"),
                         new Timestamp(data.getLong("stime")), data.getInt("viewtype"));
                 this.addMessage(message);
 
@@ -174,5 +182,25 @@ public class ExactRoomViewModel extends ViewModel {
 
     public void typingEvent() {
         mSocket.emit("typing", roomId);
+    }
+
+    public void saveMessage(Message message) {
+        Log.e(TAG, message.isSender() + "");
+        dao.insert(message)
+                .subscribeOn(Schedulers.newThread())
+                .subscribe(new CompletableObserver() {
+                    @Override
+                    public void onSubscribe(Disposable d) { }
+
+                    @Override
+                    public void onComplete() {
+                        Log.i(TAG, "Message saved");
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.e(TAG, e.getMessage());
+                    }
+                });
     }
 }

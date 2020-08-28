@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -52,7 +51,6 @@ public class RoomsListAdapter extends RecyclerView.Adapter<RoomsListAdapter.View
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView title, whoSent, lastMessage, lastMessageTime;
         LogoView logoView;
-        ConstraintLayout mainLayout;
         Context context;
 
         public ViewHolder(@NonNull View itemView) {
@@ -63,12 +61,11 @@ public class RoomsListAdapter extends RecyclerView.Adapter<RoomsListAdapter.View
             lastMessage = itemView.findViewById(R.id.last_seen_text);
             lastMessageTime = itemView.findViewById(R.id.date_time);
             logoView = itemView.findViewById(R.id.room_logo);
-            mainLayout = itemView.findViewById(R.id.main_layout);
             context = itemView.getContext();
         }
 
         void bind(ListRoom listRoom) {
-            logoView.addText(listRoom.getTitle());
+            logoView.setText(listRoom.getTitle());
             title.setText(listRoom.getTitle());
 
             if (listRoom.getLastMessage() == null) {
@@ -92,7 +89,7 @@ public class RoomsListAdapter extends RecyclerView.Adapter<RoomsListAdapter.View
                 lastMessageTime.setText(DateUtil.getDateString(listRoom.getLastActivity(), false));
             }
 
-            mainLayout.setOnClickListener(v -> {
+            itemView.setOnClickListener(v -> {
                 Bundle bundle = new Bundle();
                 bundle.putLong("roomId", listRoom.getId());
                 bundle.putString("roomTitle", listRoom.getTitle());

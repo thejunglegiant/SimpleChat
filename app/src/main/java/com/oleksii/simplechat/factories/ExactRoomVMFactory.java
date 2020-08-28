@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.oleksii.simplechat.data.SavedMessagesDao;
 import com.oleksii.simplechat.viewmodels.ExactRoomViewModel;
 
 public class ExactRoomVMFactory implements ViewModelProvider.Factory {
@@ -14,12 +15,15 @@ public class ExactRoomVMFactory implements ViewModelProvider.Factory {
     private String firstname;
     private String lastname;
     private Context context;
+    private SavedMessagesDao dao;
 
-    public ExactRoomVMFactory(long roomId, String firstname, String lastname, Context context) {
+    public ExactRoomVMFactory(long roomId, String firstname, String lastname, Context context,
+                              SavedMessagesDao dao) {
         this.roomId = roomId;
         this.firstname = firstname;
         this.lastname = lastname;
         this.context = context;
+        this.dao = dao;
     }
 
     @NonNull
@@ -29,6 +33,6 @@ public class ExactRoomVMFactory implements ViewModelProvider.Factory {
             throw new IllegalArgumentException("Unknown ViewModel class");
         }
 
-        return (T) new ExactRoomViewModel(roomId, firstname, lastname, context);
+        return (T) new ExactRoomViewModel(roomId, firstname, lastname, context, dao);
     }
 }

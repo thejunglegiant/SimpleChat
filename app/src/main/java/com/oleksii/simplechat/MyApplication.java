@@ -3,13 +3,18 @@ package com.oleksii.simplechat;
 import android.app.Application;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.content.Intent;
 import android.os.Build;
 
-import com.oleksii.simplechat.services.EventsService;
 import com.oleksii.simplechat.constants.NetworkConstants;
+import com.oleksii.simplechat.di.DaggerStorageComponent;
+import com.oleksii.simplechat.di.LocalDataModule;
+import com.oleksii.simplechat.di.StorageComponent;
 
-public class MyApplication extends Application {
+import io.reactivex.schedulers.Schedulers;
+
+public class MyApplication extends Application implements BaseApplication {
+
+    StorageComponent storageComponent;
 
     @Override
     public void onCreate() {
@@ -18,6 +23,15 @@ public class MyApplication extends Application {
 
 //        Intent intent = new Intent(this, EventsService.class);
 //        startService(intent);
+
+        storageComponent = DaggerStorageComponent.builder()
+                .localDataModule(new LocalDataModule(this))
+                .build();
+
+        // Just for test
+//        storageComponent.getDatabase().messagesDao().deleteAll()
+//                .subscribeOn(Schedulers.newThread())
+//                .subscribe();
     }
 
     private void createNotificationChannel() {
@@ -32,5 +46,10 @@ public class MyApplication extends Application {
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
         }
+    }
+
+    @Override
+    public StorageComponent getApplicationComponent() {
+        return storageComponent;
     }
 }

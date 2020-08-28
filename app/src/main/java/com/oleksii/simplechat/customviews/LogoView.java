@@ -2,22 +2,18 @@ package com.oleksii.simplechat.customviews;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
-import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 
 import com.oleksii.simplechat.R;
-
-import java.util.Random;
 
 public class LogoView extends View {
 
@@ -26,8 +22,8 @@ public class LogoView extends View {
 
     private Paint mCirclePaint;
     private Paint mTextPaint;
-    private Bitmap bitmap;
-    private String mTextLogo = "";
+    private Drawable mDrawable;
+    private String mLogoText = "";
 
     public LogoView(Context context) {
         super(context);
@@ -65,29 +61,21 @@ public class LogoView extends View {
         TypedArray arr = getContext().obtainStyledAttributes(set, R.styleable.LogoView);
 
         if (arr.getText(R.styleable.LogoView_android_text) != null)
-            mTextLogo = arr.getText(R.styleable.LogoView_android_text).toString();
+            mLogoText = arr.getText(R.styleable.LogoView_android_text).toString();
+        if (arr.getDrawable(R.styleable.LogoView_android_drawable) != null)
+            mDrawable = arr.getDrawable(R.styleable.LogoView_android_drawable);
 
         arr.recycle();
     }
 
-    public void addProfileImage(Bitmap img) {
-        bitmap = Bitmap.createBitmap(img.getWidth(), img.getHeight(), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        final Paint paint = new Paint();
-        final Rect rect = new Rect(0, 0, img.getWidth(), img.getHeight());
-
-        paint.setAntiAlias(true);
-        canvas.drawARGB(0, 0, 0, 0);
-        canvas.drawCircle(img.getWidth() / 2, img.getHeight() / 2, img.getWidth() / 2, paint);
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-        canvas.drawBitmap(img, rect, rect, paint);
+    public void setText(String text) {
+        mLogoText = text;
 
         postInvalidate();
     }
 
-    public void addText(String text) {
-        mTextLogo = text;
-        mCirclePaint.setColor(colors[((int) text.charAt(0)) % 6]);
+    public void setDrawable(int drawableId) {
+        mDrawable = ContextCompat.getDrawable(getContext(), drawableId);
 
         postInvalidate();
     }
@@ -114,20 +102,28 @@ public class LogoView extends View {
 
         mTextPaint.setTextSize(getWidth() * TEXT_SIZE_COEFFICIENT);
 
-        if (bitmap == null && !mTextLogo.equals("")) {
+        if (mDrawable == null && !mLogoText.equals("")) {
+            mCirclePaint.setColor(colors[((int) mLogoText.charAt(0)) % 6]);
+            canvas.drawCircle(cx, cy, cx, mCirclePaint);
+
             String editedText = "";
-            String[] tmp = mTextLogo.split(" ");
+            String[] tmp = mLogoText.split(" ");
             for (String s : tmp) {
                 editedText += String.valueOf(s.charAt(0)).toUpperCase();
                 if (editedText.length() > 1)
                     break;
             }
 
-            canvas.drawCircle(cx, cy, cx, mCirclePaint);
             canvas.drawText(editedText, cx,
                     cy - ((mTextPaint.descent() + mTextPaint.ascent()) / 2), mTextPaint);
-        } else if (bitmap != null) {
-            canvas.drawBitmap(bitmap, 0, 0, null);
+        } else if (mDrawable != null) {
+            mCirclePaint.setColor(colors[3]);
+            canvas.drawCircle(cx, cy, cx, mCirclePaint);
+
+            mDrawable.setBounds((int) cx / 4, (int) cy / 4, (int) (cx * 1.77), (int) (cy * 1.77));
+            mDrawable.setColorFilter(ContextCompat.getColor(getContext(), R.color.colorWhite),
+                    PorterDuff.Mode.SRC_ATOP);
+            mDrawable.draw(canvas);
         }
     }
 }

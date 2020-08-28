@@ -2,5 +2,6 @@
 <resources>
     <declare-styleable name="LogoView">
         <attr name="android:text" />
+        <attr name="android:drawable" />
     </declare-styleable>
 </resources>

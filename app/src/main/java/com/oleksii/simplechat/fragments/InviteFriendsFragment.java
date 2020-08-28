@@ -24,7 +24,7 @@ public class InviteFriendsFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_invite_friends, container, false);
 
-        Toolbar toolbar = rootView.findViewById(R.id.toolbar);
+        Toolbar toolbar = rootView.findViewById(R.id.main_toolbar);
         toolbar.setNavigationOnClickListener(v -> Navigation.findNavController(v)
                 .navigate(R.id.action_inviteFriendsFragment_to_chatsListFragment));
 

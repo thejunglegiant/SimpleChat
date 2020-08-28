@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/sending_area"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/colorWhite"
+    android:gravity="center_vertical"
+    android:paddingHorizontal="@dimen/def_margin"
+    app:layout_constraintBottom_toBottomOf="parent">
+
+    <EditText
+        android:id="@+id/message_box"
+        style="@style/textStandard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="@dimen/def_margin"
+        android:layout_marginEnd="@dimen/def_margin"
+        android:layout_weight="3"
+        android:background="@android:color/transparent"
+        android:hint="@string/message"
+        android:inputType="textCapSentences|textMultiLine"
+        android:textSize="24sp" />
+
+    <ImageButton
+        android:id="@+id/send_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/round_ripple"
+        android:src="@drawable/ic_send_button"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+</LinearLayout>

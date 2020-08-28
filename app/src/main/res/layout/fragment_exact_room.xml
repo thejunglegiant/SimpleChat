@@ -8,7 +8,7 @@
     tools:context=".fragments.ExactRoomFragment">
 
     <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
+        android:id="@+id/main_toolbar"
         android:layout_width="match_parent"
         android:layout_height="?android:attr/actionBarSize"
         android:background="?attr/colorPrimary"
@@ -56,7 +56,7 @@
                     android:textColor="@color/colorWhite"
                     android:textSize="16sp"
                     tools:text="18 members"
-                    tools:visibility="invisible"/>
+                    tools:visibility="invisible" />
 
             </LinearLayout>
 
@@ -71,28 +71,18 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="@+id/linearLayout2"
                 tools:text="Alex is typing..."
-                tools:visibility="visible"/>
+                tools:visibility="visible" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.appcompat.widget.Toolbar>
 
-    <TextView
-        android:id="@+id/floating_header"
-        style="@style/textStandard"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/small_margin"
-        android:background="@drawable/half_transparent_grey_oval"
-        android:elevation="2dp"
-        android:padding="@dimen/small_margin"
-        android:textColor="@color/colorWhite"
-        android:textSize="12sp"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/messages_list"
-        tools:text="Jun 17"
-        tools:visibility="visible" />
+    <include
+        android:id="@+id/actions_toolbar"
+        layout="@layout/actions_toolbar"
+        android:visibility="invisible"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <include layout="@layout/date_header" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/messages_list"
@@ -100,38 +90,8 @@
         android:layout_height="0dp"
         android:layout_marginBottom="@dimen/room_elements_margin"
         app:layout_constraintBottom_toTopOf="@id/sending_area"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+        app:layout_constraintTop_toBottomOf="@+id/main_toolbar" />
 
-    <LinearLayout
-        android:id="@+id/sending_area"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/colorWhite"
-        android:gravity="center_vertical"
-        android:paddingHorizontal="@dimen/def_margin"
-        app:layout_constraintBottom_toBottomOf="parent">
+    <include layout="@layout/message_sending_box" />
 
-        <EditText
-            android:id="@+id/message_box"
-            style="@style/textStandard"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginVertical="@dimen/def_margin"
-            android:layout_marginEnd="@dimen/def_margin"
-            android:layout_weight="3"
-            android:background="@android:color/transparent"
-            android:hint="@string/message"
-            android:inputType="textCapSentences|textMultiLine"
-            android:textSize="24sp" />
-
-        <ImageButton
-            android:id="@+id/send_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/round_ripple"
-            android:src="@drawable/ic_send_button"
-            android:visibility="gone"
-            tools:visibility="visible" />
-
-    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

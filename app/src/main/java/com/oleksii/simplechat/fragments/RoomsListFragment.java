@@ -55,7 +55,7 @@ public class RoomsListFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_rooms_list, container, false);
 
-        toolbar = rootView.findViewById(R.id.toolbar);
+        toolbar = rootView.findViewById(R.id.main_toolbar);
         roomsListRecycler = rootView.findViewById(R.id.rooms_list);
 
         setupToolbar();

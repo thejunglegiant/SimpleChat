@@ -37,7 +37,7 @@ public class NewGroupFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_new_group, container, false);
 
-        toolbar = rootView.findViewById(R.id.toolbar);
+        toolbar = rootView.findViewById(R.id.main_toolbar);
         usersListRecycler = rootView.findViewById(R.id.available_people_list);
         fab = rootView.findViewById(R.id.fab);
 

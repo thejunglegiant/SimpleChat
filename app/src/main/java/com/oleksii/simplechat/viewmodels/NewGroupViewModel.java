@@ -13,7 +13,7 @@ import com.oleksii.simplechat.di.AppComponent;
 import com.oleksii.simplechat.di.DaggerAppComponent;
 import com.oleksii.simplechat.models.NewRoom;
 import com.oleksii.simplechat.models.User;
-import com.oleksii.simplechat.utils.ChatAPI;
+import com.oleksii.simplechat.data.net.ChatAPI;
 
 import java.util.LinkedList;
 import java.util.List;

@@ -9,7 +9,7 @@
         android:id="@+id/roomsListFragment"
         android:name="com.oleksii.simplechat.fragments.RoomsListFragment"
         android:label="fragment_chats_list"
-        tools:layout="@layout/fragment_rooms_list" >
+        tools:layout="@layout/fragment_rooms_list">
         <action
             android:id="@+id/action_chatsListFragment_to_inviteFriendsFragment"
             app:destination="@id/inviteFriendsFragment"
@@ -24,12 +24,19 @@
             app:exitAnim="@anim/exit_to_left"
             app:popEnterAnim="@anim/enter_from_left"
             app:popExitAnim="@anim/exit_to_right" />
+        <action
+            android:id="@+id/action_roomsListFragment_to_savedMessagesFragment"
+            app:destination="@id/savedMessagesFragment"
+            app:enterAnim="@anim/enter_from_right"
+            app:exitAnim="@anim/exit_to_left"
+            app:popEnterAnim="@anim/enter_from_left"
+            app:popExitAnim="@anim/exit_to_right" />
     </fragment>
     <fragment
         android:id="@+id/inviteFriendsFragment"
         android:name="com.oleksii.simplechat.fragments.InviteFriendsFragment"
         android:label="fragment_invite_friends"
-        tools:layout="@layout/fragment_invite_friends" >
+        tools:layout="@layout/fragment_invite_friends">
         <action
             android:id="@+id/action_inviteFriendsFragment_to_chatsListFragment"
             app:destination="@id/roomsListFragment"
@@ -42,7 +49,7 @@
         android:id="@+id/exactRoomFragment"
         android:name="com.oleksii.simplechat.fragments.ExactRoomFragment"
         android:label="fragment_exact_room"
-        tools:layout="@layout/fragment_exact_room" >
+        tools:layout="@layout/fragment_exact_room">
         <action
             android:id="@+id/action_exactRoomFragment_to_chatsListFragment"
             app:destination="@id/roomsListFragment"
@@ -59,5 +66,21 @@
         <argument
             android:name="roomTitle"
             app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/savedMessagesFragment"
+        android:name="com.oleksii.simplechat.fragments.SavedMessagesFragment"
+        android:label="SavedMessagesFragment"
+        tools:layout="@layout/fragment_saved_messages">
+        <action
+            android:id="@+id/action_savedMessagesFragment_to_roomsListFragment"
+            app:destination="@id/roomsListFragment"
+            app:enterAnim="@anim/enter_from_left"
+            app:exitAnim="@anim/exit_to_right"
+            app:launchSingleTop="true"
+            app:popEnterAnim="@anim/enter_from_right"
+            app:popExitAnim="@anim/exit_to_left"
+            app:popUpTo="@id/roomsListFragment"
+            app:popUpToInclusive="true" />
     </fragment>
 </navigation>

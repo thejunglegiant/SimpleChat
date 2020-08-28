@@ -8,34 +8,15 @@ public class User {
 
     @SerializedName("id")
     private String userId;
-
     private String firstname;
-
     private String lastname;
-
     @SerializedName("last_session")
     private Timestamp lastSession;
-
-    public User(String userId) {
-        this.userId = userId;
-    }
-
-    public User(String firstname, String lastname) {
-        this.firstname = firstname;
-        this.lastname = lastname;
-    }
 
     public User(String userId, String firstname, String lastname) {
         this.userId = userId;
         this.firstname = firstname;
         this.lastname = lastname;
-    }
-
-    public User(String userId, String firstname, String lastname, Timestamp lastSession) {
-        this.userId = userId;
-        this.firstname = firstname;
-        this.lastname = lastname;
-        this.lastSession = lastSession;
     }
 
     public String getUserId() {

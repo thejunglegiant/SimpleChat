@@ -30,7 +30,8 @@
         android:paddingHorizontal="@dimen/def_margin"
         android:paddingVertical="@dimen/room_elements_margin"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="?android:attr/selectableItemBackground">
 
         <com.oleksii.simplechat.customviews.LogoView
             android:id="@+id/sender_logo"

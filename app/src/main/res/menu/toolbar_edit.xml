@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/edit_button"
+        android:title="@string/edit_text"
+        android:icon="@drawable/ic_pencil"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/copy_text_button"
+        android:title="@string/copy_text"
+        android:icon="@drawable/ic_copy_button_white"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/save_message_button"
+        android:title="@string/save_message"
+        android:icon="@drawable/ic_bookmark_white"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/delete_message_button"
+        android:title="@string/delete_message"
+        android:icon="@drawable/ic_delete_white"
+        app:showAsAction="always" />
+
+</menu>

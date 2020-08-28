@@ -113,7 +113,7 @@ public class MainActivity extends AppCompatActivity
         TextView textView = headerView.findViewById(R.id.user_name);
         LogoView logoView = headerView.findViewById(R.id.user_logo);
         String str = firstname + " " + lastname;
-        logoView.addText(str);
+        logoView.setText(str);
         textView.setText(str);
     }
 
@@ -135,7 +135,9 @@ public class MainActivity extends AppCompatActivity
                 toggleDrawer();
                 break;
             case R.id.saved_messages:
-                // TODO
+                Navigation.findNavController(this, R.id.fragments_container)
+                        .navigate(R.id.action_roomsListFragment_to_savedMessagesFragment);
+                toggleDrawer();
                 break;
             case R.id.settings:
                 // TODO

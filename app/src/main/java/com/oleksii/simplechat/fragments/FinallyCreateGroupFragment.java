@@ -45,7 +45,7 @@ public class FinallyCreateGroupFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_finally_create_group, container, false);
 
-        toolbar = rootView.findViewById(R.id.toolbar);
+        toolbar = rootView.findViewById(R.id.main_toolbar);
         roomTitleText = rootView.findViewById(R.id.room_title_edit);
         roomLogo = rootView.findViewById(R.id.room_logo);
         membersText = rootView.findViewById(R.id.members);
@@ -96,7 +96,7 @@ public class FinallyCreateGroupFragment extends Fragment {
                 .subscribe(input -> {
                     if (input.toString().trim().length() > 0) {
                         roomLogo.setVisibility(View.VISIBLE);
-                        roomLogo.addText(input.toString().trim());
+                        roomLogo.setText(input.toString().trim());
                     } else {
                         roomLogo.setVisibility(View.INVISIBLE);
                     }

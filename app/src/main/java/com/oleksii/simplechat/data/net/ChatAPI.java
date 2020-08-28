@@ -1,6 +1,4 @@
-package com.oleksii.simplechat.utils;
-
-import androidx.room.Update;
+package com.oleksii.simplechat.data.net;
 
 import com.oleksii.simplechat.models.ExactRoom;
 import com.oleksii.simplechat.models.ListRoom;
@@ -10,7 +8,6 @@ import java.util.List;
 
 import io.reactivex.Single;
 import retrofit2.http.GET;
-import retrofit2.http.POST;
 import retrofit2.http.Path;
 
 public interface ChatAPI {
