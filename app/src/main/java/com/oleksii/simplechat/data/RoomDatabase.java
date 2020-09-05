@@ -8,7 +8,6 @@ import androidx.room.TypeConverters;
 
 import com.oleksii.simplechat.data.converters.DateConverter;
 import com.oleksii.simplechat.data.converters.TimestampConverter;
-import com.oleksii.simplechat.data.entities.SavedMessage;
 import com.oleksii.simplechat.models.Message;
 
 @Database(entities = { Message.class }, version = 1, exportSchema = false)

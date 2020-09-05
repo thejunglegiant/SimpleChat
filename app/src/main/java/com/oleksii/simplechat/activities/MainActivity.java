@@ -152,12 +152,4 @@ public class MainActivity extends AppCompatActivity
         }
         return true;
     }
-
-    public String getFirstname() {
-        return firstname;
-    }
-
-    public String getLastname() {
-        return lastname;
-    }
 }

@@ -12,6 +12,7 @@
     tools:menu="@menu/toolbar_edit">
 
     <TextView
+        android:id="@+id/selected_messages_counter"
         style="@style/textHighlighted"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"

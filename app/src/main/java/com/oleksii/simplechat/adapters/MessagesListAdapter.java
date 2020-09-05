@@ -1,9 +1,13 @@
 package com.oleksii.simplechat.adapters;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -22,10 +26,13 @@ import com.oleksii.simplechat.utils.DateUtil;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MessagesListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private List<Message> mMessagesList = new LinkedList<>();
+    private List<Message> mCheckedMessagesList = new LinkedList<>();
     private ClickDelegate delegate;
 
     public void attachDelegate(ClickDelegate delegate) {
@@ -38,6 +45,13 @@ public class MessagesListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         mMessagesList.clear();
         mMessagesList.addAll(list);
         notifyDataSetChanged();
+    }
+
+    public void unCheckAllMessages() {
+        for (Message item : mCheckedMessagesList) {
+            notifyItemChanged(mMessagesList.indexOf(item));
+        }
+        mCheckedMessagesList.clear();
     }
 
     @Override
@@ -65,7 +79,7 @@ public class MessagesListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         switch (holder.getItemViewType()) {
             case 0:
-                ((RegularViewHolder) holder).bind(mMessagesList.get(position),
+                ((RegularViewHolder) holder).bind(mCheckedMessagesList, mMessagesList.get(position),
                         position - 1 >= 0 ? mMessagesList.get(position - 1) : null,
                         position + 1 < mMessagesList.size() ? mMessagesList.get(position + 1) : null);
                 break;
@@ -124,7 +138,13 @@ public class MessagesListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             strangerBox = ContextCompat.getDrawable(context, R.drawable.stranger_message_box);
         }
 
-        public void bind(Message message, Message prevMessage, Message nextMessage) {
+        @SuppressLint("ClickableViewAccessibility")
+        public void bind(List<Message> checkedMessages,
+                         Message message, Message prevMessage, Message nextMessage) {
+            if (!checkedMessages.contains(message)) {
+                linearLayout.setBackgroundColor(Color.TRANSPARENT);
+            }
+
             if (prevMessage == null || DateUtil.isNewDay(prevMessage.getSendingTime(), message.getSendingTime())) {
                 header.setText(DateUtil.getDayMonthString(message.getSendingTime()));
                 header.setVisibility(View.VISIBLE);
@@ -168,9 +188,51 @@ public class MessagesListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             messageBody.setText(message.getBody());
             messageSendingTime.setText(DateUtil.getTimeString(message.getSendingTime()));
 
-            linearLayout.setOnLongClickListener(v -> {
-                delegate.onLongClickEvent(message);
-                return false;
+            linearLayout.setOnTouchListener(new View.OnTouchListener() {
+                private Timer timer = new Timer();
+                private long LONG_PRESS_TIMEOUT = 700;
+                private boolean wasLong = false;
+
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                        timer.schedule(new TimerTask() {
+                            @Override
+                            public void run() {
+                                wasLong = true;
+                            }
+                        }, LONG_PRESS_TIMEOUT);
+                        return true;
+                    }
+
+                    if (event.getAction() == MotionEvent.ACTION_UP) {
+                        timer.cancel();
+                        if (wasLong) {
+                            if (checkedMessages.size() < 1) {
+                                linearLayout.setBackgroundColor(context.getColor(
+                                        R.color.colorTransparentPrimary));
+                                checkedMessages.add(message);
+                                delegate.onLongClickEvent(message);
+                            }
+                        } else {
+                            if (checkedMessages.size() > 0 && !checkedMessages.contains(message)) {
+                                linearLayout.setBackgroundColor(context.getColor(
+                                        R.color.colorTransparentPrimary));
+                                checkedMessages.add(message);
+                                delegate.onShortClickEvent(message);
+                            } else if (checkedMessages.contains(message)) {
+                                linearLayout.setBackgroundColor(Color.TRANSPARENT);
+                                checkedMessages.remove(message);
+                                delegate.onSecondShortClickEvent(message);
+                            }
+                        }
+                        timer = new Timer();
+                        wasLong = false;
+                        return true;
+                    }
+
+                    return false;
+                }
             });
         }
     }

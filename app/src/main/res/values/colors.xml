@@ -9,6 +9,7 @@
     <color name="whiteGray">#E5E5E5</color>
     <color name="colorWhite">#FFFFFF</color>
     <color name="userMessageColorBox">#9ccc65</color>
+    <color name="colorTransparentPrimary">#502d82bc</color>
     <color name="colorRed800">#c62828</color>
     <color name="colorLightRed">#E66650</color>
     <color name="colorOrange">#F68C40</color>

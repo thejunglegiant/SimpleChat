@@ -14,7 +14,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.gson.Gson;
 import com.oleksii.simplechat.constants.NetworkConstants;
 import com.oleksii.simplechat.data.SavedMessagesDao;
-import com.oleksii.simplechat.data.entities.SavedMessage;
 import com.oleksii.simplechat.di.AppComponent;
 import com.oleksii.simplechat.di.DaggerAppComponent;
 import com.oleksii.simplechat.models.ExactRoom;
@@ -30,8 +29,9 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import io.reactivex.Completable;
 import io.reactivex.CompletableObserver;
+import io.reactivex.Observable;
+import io.reactivex.Observer;
 import io.reactivex.SingleObserver;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
@@ -40,12 +40,11 @@ import retrofit2.Retrofit;
 public class ExactRoomViewModel extends ViewModel {
 
     private static final String TAG = ExactRoomViewModel.class.getName();
-    private MutableLiveData<List<Message>> messagesList = new MutableLiveData<>();
+    private MutableLiveData<List<Message>> mMessagesList = new MutableLiveData<>();
+    private List<Message> mSaveMessagesList = new LinkedList<>();
     private MutableLiveData<Integer> membersCount = new MutableLiveData<>();
     private MutableLiveData<String> typingUser = new MutableLiveData<>();
     private long roomId;
-    private String firstname;
-    private String lastname;
     private SavedMessagesDao dao;
     @Inject Gson gson;
     @Inject Socket mSocket;
@@ -60,11 +59,8 @@ public class ExactRoomViewModel extends ViewModel {
         mSocket.off(NetworkConstants.NEW_MESSAGE_RECEIVED_EVENT_ID, onNewMessageReceived);
     }
 
-    public ExactRoomViewModel(long roomId, String firstname, String lastname, Context context,
-                              SavedMessagesDao dao) {
+    public ExactRoomViewModel(long roomId, Context context, SavedMessagesDao dao) {
         this.roomId = roomId;
-        this.firstname = firstname;
-        this.lastname = lastname;
         this.dao = dao;
         notificationManager = (NotificationManager) context
                 .getSystemService(Context.NOTIFICATION_SERVICE);
@@ -78,7 +74,7 @@ public class ExactRoomViewModel extends ViewModel {
     }
 
     private void init() {
-        messagesList.setValue(new LinkedList<>());
+        mMessagesList.setValue(new LinkedList<>());
 
         mSocket.on(NetworkConstants.NEW_MESSAGE_RECEIVED_EVENT_ID, onNewMessageReceived);
         mSocket.on(NetworkConstants.SOMEONE_LEFT_GROUP_EVENT_ID, onSomeoneLeftGroup);
@@ -93,7 +89,7 @@ public class ExactRoomViewModel extends ViewModel {
                     @Override
                     public void onSuccess(ExactRoom exactRoom) {
                         membersCount.postValue(exactRoom.getMembers());
-                        messagesList.postValue(exactRoom.getMessages());
+                        mMessagesList.postValue(exactRoom.getMessages());
                     }
 
                     @Override
@@ -143,13 +139,13 @@ public class ExactRoomViewModel extends ViewModel {
     };
 
     public void addMessage(Message message) {
-        List<Message> tmp = messagesList.getValue();
+        List<Message> tmp = mMessagesList.getValue();
         tmp.add(message);
-        messagesList.postValue(tmp);
+        mMessagesList.postValue(tmp);
     }
 
-    public LiveData<List<Message>> getMessagesList() {
-        return this.messagesList;
+    public LiveData<List<Message>> getmMessagesList() {
+        return this.mMessagesList;
     }
 
     public LiveData<Integer> getMembersCount() {
@@ -184,23 +180,60 @@ public class ExactRoomViewModel extends ViewModel {
         mSocket.emit("typing", roomId);
     }
 
-    public void saveMessage(Message message) {
-        Log.e(TAG, message.isSender() + "");
-        dao.insert(message)
-                .subscribeOn(Schedulers.newThread())
-                .subscribe(new CompletableObserver() {
-                    @Override
-                    public void onSubscribe(Disposable d) { }
+    public void addMessageToSaveList(Message message) {
+        mSaveMessagesList.add(message);
+    }
 
-                    @Override
-                    public void onComplete() {
-                        Log.i(TAG, "Message saved");
-                    }
+    public void removeMessageFromSaveList(Message message) {
+        mSaveMessagesList.remove(message);
+    }
 
-                    @Override
-                    public void onError(Throwable e) {
-                        Log.e(TAG, e.getMessage());
-                    }
-                });
+    public void clearSaveMessagesList() {
+        mSaveMessagesList.clear();
+    }
+
+    public List<Message> getSaveMessagesList() {
+        return mSaveMessagesList;
+    }
+
+    public void saveMessages() {
+        if (mSaveMessagesList.size() > 0) {
+            Observable.fromIterable(mSaveMessagesList).subscribe(new Observer<Message>() {
+                @Override
+                public void onSubscribe(Disposable d) {
+                }
+
+                @Override
+                public void onNext(Message message) {
+                    dao.insert(message)
+                            .subscribeOn(Schedulers.newThread())
+                            .subscribe(new CompletableObserver() {
+                                @Override
+                                public void onSubscribe(Disposable d) {
+                                }
+
+                                @Override
+                                public void onComplete() {
+                                    Log.i(TAG, "Message saved");
+                                }
+
+                                @Override
+                                public void onError(Throwable e) {
+                                    Log.e(TAG, e.getMessage());
+                                }
+                            });
+                }
+
+                @Override
+                public void onError(Throwable e) {
+                    Log.e(TAG, e.getMessage());
+                }
+
+                @Override
+                public void onComplete() {
+                    Log.i(TAG, "All messages were successfully saved");
+                }
+            });
+        }
     }
 }

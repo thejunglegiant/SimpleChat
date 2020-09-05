@@ -1,6 +1,5 @@
 package com.oleksii.simplechat.fragments;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
@@ -27,7 +26,6 @@ import com.jakewharton.rxbinding4.recyclerview.RxRecyclerView;
 import com.jakewharton.rxbinding4.widget.RxTextView;
 import com.oleksii.simplechat.MyApplication;
 import com.oleksii.simplechat.R;
-import com.oleksii.simplechat.activities.MainActivity;
 import com.oleksii.simplechat.adapters.MessagesListAdapter;
 import com.oleksii.simplechat.adapters.delegates.ClickDelegate;
 import com.oleksii.simplechat.customviews.LogoView;
@@ -47,9 +45,8 @@ public class ExactRoomFragment extends Fragment {
 
     private long roomId;
     private String roomTitle;
-    private MainActivity parentActivity;
-    private Toolbar toolbar;
-    private TextView titleText, membersText, floatingHeader, typingText;
+    private Toolbar toolbar, actionsToolbar;
+    private TextView titleText, membersText, floatingHeader, typingText, selectedMessagesCounter;
     private LogoView roomLogo;
     private ImageButton sendButton;
     private EditText messageEditText;
@@ -58,13 +55,9 @@ public class ExactRoomFragment extends Fragment {
     private MessagesListAdapter mAdapter = new MessagesListAdapter();
     private ExactRoomViewModel viewModel;
 
-    public ExactRoomFragment() { }
+    private final long TYPING_ANIMATION_SPEED = 300;
 
-    @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        parentActivity = (MainActivity) getActivity();
-    }
+    public ExactRoomFragment() { }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -81,22 +74,158 @@ public class ExactRoomFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_exact_room, container, false);
 
         toolbar = rootView.findViewById(R.id.main_toolbar);
+        actionsToolbar = rootView.findViewById(R.id.actions_toolbar);
         titleText = rootView.findViewById(R.id.room_title);
         membersText = rootView.findViewById(R.id.room_members_amount);
         roomLogo = rootView.findViewById(R.id.room_logo);
         typingText = rootView.findViewById(R.id.typing_event_text);
         floatingHeader = rootView.findViewById(R.id.floating_header);
+        selectedMessagesCounter = rootView.findViewById(R.id.selected_messages_counter);
         messagesListRecycler = rootView.findViewById(R.id.messages_list);
         sendButton = rootView.findViewById(R.id.send_button);
         messageEditText = rootView.findViewById(R.id.message_box);
 
-        setupToolbar();
+        setupToolbars();
         setupAdapter();
         setupViewModel();
         setupFloatingHeader();
         setupMessageBoxSection();
 
         return rootView;
+    }
+
+    private void setupToolbars() {
+        // Main toolbar
+        toolbar.inflateMenu(R.menu.toolbar_exact_room);
+        toolbar.setNavigationOnClickListener(v -> {
+            goToMainList();
+        });
+        toolbar.setOnMenuItemClickListener(item -> {
+            if (item.getItemId() == R.id.leave_room_button) {
+                viewModel.leaveGroup();
+                goToMainList();
+                return true;
+            }
+            return super.onOptionsItemSelected(item);
+        });
+        titleText.setText(roomTitle);
+        roomLogo.setText(roomTitle);
+
+        // Actions toolbar
+        actionsToolbar.inflateMenu(R.menu.toolbar_edit);
+        actionsToolbar.setNavigationOnClickListener(v -> {
+            hideActionsToolbar();
+        });
+        actionsToolbar.setOnMenuItemClickListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.edit_button:
+                    // TODO
+                    return true;
+                case R.id.copy_text_button:
+                    // TODO
+                    return true;
+                case R.id.save_message_button:
+                    viewModel.saveMessages();
+                    hideActionsToolbar();
+                    return true;
+                case R.id.delete_message_button:
+                    return true;
+                default:
+                    return super.onOptionsItemSelected(item);
+            }
+        });
+    }
+
+    private void goToMainList() {
+        KeyboardUtil.hideKeyboardFrom(messageEditText);
+        Navigation.findNavController(toolbar)
+                .navigate(R.id.action_exactRoomFragment_to_chatsListFragment);
+    }
+
+    private void hideActionsToolbar() {
+        Animation fadeOut = AnimationUtils.loadAnimation(getContext(), R.anim.fade_out);
+        fadeOut.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) { }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                actionsToolbar.setVisibility(View.INVISIBLE);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) { }
+        });
+        actionsToolbar.startAnimation(fadeOut);
+        viewModel.clearSaveMessagesList();
+        mAdapter.unCheckAllMessages();
+    }
+
+    private void setupAdapter() {
+        layoutManager = new LinearLayoutManager(getContext());
+        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        layoutManager.setStackFromEnd(true);
+        layoutManager.setSmoothScrollbarEnabled(false);
+        Animation fadeIn = AnimationUtils.loadAnimation(getContext(), R.anim.fade_in);
+        fadeIn.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) { }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                actionsToolbar.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) { }
+        });
+        mAdapter.attachDelegate(new ClickDelegate() {
+            @Override
+            public void onShortClickEvent(Message message) {
+                viewModel.addMessageToSaveList(message);
+                selectedMessagesCounter.setText(String.valueOf(viewModel.getSaveMessagesList().size()));
+            }
+
+            @Override
+            public void onSecondShortClickEvent(Message message) {
+                viewModel.removeMessageFromSaveList(message);
+                int listSize = viewModel.getSaveMessagesList().size();
+                selectedMessagesCounter.setText(String.valueOf(listSize));
+                if (listSize < 1) {
+                    hideActionsToolbar();
+                }
+            }
+
+            @Override
+            public void onLongClickEvent(Message message) {
+                viewModel.addMessageToSaveList(message);
+                selectedMessagesCounter.setText(String.valueOf(viewModel.getSaveMessagesList().size()));
+
+                if (actionsToolbar.getVisibility() != View.VISIBLE)
+                    actionsToolbar.startAnimation(fadeIn);
+            }
+        });
+        messagesListRecycler.setLayoutManager(layoutManager);
+        messagesListRecycler.setAdapter(mAdapter);
+    }
+
+    private void setupViewModel() {
+        ExactRoomVMFactory factory = new ExactRoomVMFactory(roomId, getContext(),
+                ((MyApplication) getActivity().getApplication()).getApplicationComponent()
+                        .getDatabase().messagesDao());
+        viewModel = new ViewModelProvider(this, factory).get(ExactRoomViewModel.class);
+        viewModel.getmMessagesList().observe(getViewLifecycleOwner(), list -> {
+            mAdapter.submitAll(list);
+            messagesListRecycler.scrollToPosition(mAdapter.getItemCount() - 1);
+        });
+        viewModel.getMembersCount().observe(getViewLifecycleOwner(), number -> {
+            String str = number + " " + getString(R.string.members);
+            membersText.setText(str);
+        });
+        viewModel.getTypingUser().observe(getViewLifecycleOwner(), name -> {
+            String str = name + " " + getString(R.string.is_typing);
+            startTypingAnimation(str);
+        });
     }
 
     private void setupFloatingHeader() {
@@ -139,13 +268,13 @@ public class ExactRoomFragment extends Fragment {
                     @Override
                     public void onNext(@NonNull RecyclerViewScrollEvent recyclerViewScrollEvent) {
                         floatingHeader.setText(DateUtil.getDayMonthString(
-                                viewModel.getMessagesList().getValue().get(layoutManager
+                                viewModel.getmMessagesList().getValue().get(layoutManager
                                         .findFirstVisibleItemPosition()).getSendingTime()));
 
                         handler.removeCallbacks(runnable);
                         if (animationAllowed[0]
                                 && layoutManager.findLastVisibleItemPosition()
-                                < viewModel.getMessagesList().getValue().size() - 1) {
+                                < viewModel.getmMessagesList().getValue().size() - 1) {
                             animationAllowed[0] = false;
                             floatingHeader.startAnimation(fadeIn);
                         }
@@ -158,72 +287,6 @@ public class ExactRoomFragment extends Fragment {
                     @Override
                     public void onComplete() { }
                 });
-    }
-
-    private void setupToolbar() {
-        toolbar.inflateMenu(R.menu.toolbar_exact_room);
-        toolbar.setNavigationOnClickListener(v -> {
-            goToMainList();
-        });
-        toolbar.setOnMenuItemClickListener(item -> {
-            if (item.getItemId() == R.id.leave_room_button) {
-                viewModel.leaveGroup();
-                goToMainList();
-                return true;
-            }
-            return super.onOptionsItemSelected(item);
-        });
-        titleText.setText(roomTitle);
-        roomLogo.setText(roomTitle);
-    }
-
-    private void goToMainList() {
-        KeyboardUtil.hideKeyboardFrom(messageEditText);
-        Navigation.findNavController(toolbar)
-                .navigate(R.id.action_exactRoomFragment_to_chatsListFragment);
-    }
-
-    private void setupAdapter() {
-        layoutManager = new LinearLayoutManager(getContext());
-        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        layoutManager.setStackFromEnd(true);
-        layoutManager.setSmoothScrollbarEnabled(false);
-        mAdapter.attachDelegate(new ClickDelegate() {
-            @Override
-            public void onClickEvent(Message message) { }
-
-            @Override
-            public void onLongClickEvent(Message message) {
-                viewModel.saveMessage(message);
-            }
-        });
-        messagesListRecycler.setLayoutManager(layoutManager);
-        messagesListRecycler.setAdapter(mAdapter);
-        messagesListRecycler.addOnLayoutChangeListener((v, left, top, right, bottom,
-                                                        oldLeft, oldTop, oldRight, oldBottom) -> {
-            if (bottom < oldBottom) {
-                messagesListRecycler.postDelayed(() ->
-                        messagesListRecycler.smoothScrollToPosition(mAdapter.getItemCount()), 100);
-            }
-        });
-    }
-
-    private void setupViewModel() {
-        ExactRoomVMFactory factory = new ExactRoomVMFactory(roomId, parentActivity.getFirstname(),
-                parentActivity.getLastname(), getContext(), ((MyApplication) getActivity().getApplication()).getApplicationComponent().getDatabase().messagesDao());
-        viewModel = new ViewModelProvider(this, factory).get(ExactRoomViewModel.class);
-        viewModel.getMessagesList().observe(getViewLifecycleOwner(), list -> {
-            mAdapter.submitAll(list);
-            messagesListRecycler.scrollToPosition(mAdapter.getItemCount() - 1);
-        });
-        viewModel.getMembersCount().observe(getViewLifecycleOwner(), number -> {
-            String str = number + " " + getString(R.string.members);
-            membersText.setText(str);
-        });
-        viewModel.getTypingUser().observe(getViewLifecycleOwner(), name -> {
-            String str = name + " " + getString(R.string.is_typing);
-            startTypingAnimation(str);
-        });
     }
 
     private void startTypingAnimation(String str) {
@@ -240,10 +303,10 @@ public class ExactRoomFragment extends Fragment {
                     handler.postDelayed(() -> {
                         membersText.setVisibility(View.VISIBLE);
                         typingText.setVisibility(View.INVISIBLE);
-                    }, 300);
-                }, 300);
-            }, 300);
-        }, 300);
+                    }, TYPING_ANIMATION_SPEED);
+                }, TYPING_ANIMATION_SPEED);
+            }, TYPING_ANIMATION_SPEED);
+        }, TYPING_ANIMATION_SPEED);
     }
 
     private void setupMessageBoxSection() {
@@ -307,6 +370,8 @@ public class ExactRoomFragment extends Fragment {
         sendButton.setOnClickListener(v -> {
             viewModel.sendMessage(messageEditText.getText().toString().trim());
             messageEditText.setText("");
+            messagesListRecycler.postDelayed(() ->
+                    messagesListRecycler.smoothScrollToPosition(mAdapter.getItemCount()), 100);
         });
     }
 }

@@ -12,16 +12,11 @@ import com.oleksii.simplechat.viewmodels.ExactRoomViewModel;
 public class ExactRoomVMFactory implements ViewModelProvider.Factory {
 
     private long roomId;
-    private String firstname;
-    private String lastname;
     private Context context;
     private SavedMessagesDao dao;
 
-    public ExactRoomVMFactory(long roomId, String firstname, String lastname, Context context,
-                              SavedMessagesDao dao) {
+    public ExactRoomVMFactory(long roomId, Context context, SavedMessagesDao dao) {
         this.roomId = roomId;
-        this.firstname = firstname;
-        this.lastname = lastname;
         this.context = context;
         this.dao = dao;
     }
@@ -33,6 +28,6 @@ public class ExactRoomVMFactory implements ViewModelProvider.Factory {
             throw new IllegalArgumentException("Unknown ViewModel class");
         }
 
-        return (T) new ExactRoomViewModel(roomId, firstname, lastname, context, dao);
+        return (T) new ExactRoomViewModel(roomId, context, dao);
     }
 }
