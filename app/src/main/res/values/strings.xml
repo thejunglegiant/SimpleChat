@@ -59,4 +59,5 @@
     <string name="copy_text">Copy text`</string>
     <string name="save_message">Save message</string>
     <string name="delete_message">Delete message</string>
+    <string name="messages_were_saved">Selected messages were saved!</string>
 </resources>

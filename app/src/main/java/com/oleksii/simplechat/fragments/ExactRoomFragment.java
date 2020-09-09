@@ -1,5 +1,8 @@
 package com.oleksii.simplechat.fragments;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
@@ -12,6 +15,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
@@ -21,6 +25,7 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.jakewharton.rxbinding4.recyclerview.RecyclerViewScrollEvent;
 import com.jakewharton.rxbinding4.recyclerview.RxRecyclerView;
 import com.jakewharton.rxbinding4.widget.RxTextView;
@@ -118,17 +123,34 @@ public class ExactRoomFragment extends Fragment {
         });
         actionsToolbar.setOnMenuItemClickListener(item -> {
             switch (item.getItemId()) {
-                case R.id.edit_button:
-                    // TODO
-                    return true;
                 case R.id.copy_text_button:
-                    // TODO
+                    if (viewModel.getSelectedMessagesList().size() > 0) {
+                        String stringToCopy = "";
+                        for (Message message : viewModel.getSelectedMessagesList()) {
+                            stringToCopy += (viewModel.getSelectedMessagesList().indexOf(message) == 0
+                                    || !viewModel.getSelectedMessagesList().get(
+                                    viewModel.getSelectedMessagesList().indexOf(message) - 1)
+                                    .getUserId().equals(message.getUserId())
+                                    ? message.getFirstname() + " " + message.getLastname() + ":\n" : "")
+                                    + message.getBody() + (viewModel.getSelectedMessagesList().size() !=
+                                    viewModel.getSelectedMessagesList().indexOf(message) + 1 ? "\n\n" : "");
+                        }
+                        ClipboardManager clipboardManager = (ClipboardManager)
+                                getContext().getSystemService(Context.CLIPBOARD_SERVICE);
+                        ClipData clip = ClipData.newPlainText("CopiedChatMessage", stringToCopy);
+                        clipboardManager.setPrimaryClip(clip);
+                        Toast.makeText(getContext(), getString(R.string.messages_were_saved),
+                                Toast.LENGTH_SHORT).show();
+                        hideActionsToolbar();
+                    }
                     return true;
                 case R.id.save_message_button:
                     viewModel.saveMessages();
                     hideActionsToolbar();
                     return true;
                 case R.id.delete_message_button:
+                    viewModel.deleteMessages();
+                    hideActionsToolbar();
                     return true;
                 default:
                     return super.onOptionsItemSelected(item);
@@ -157,7 +179,7 @@ public class ExactRoomFragment extends Fragment {
             public void onAnimationRepeat(Animation animation) { }
         });
         actionsToolbar.startAnimation(fadeOut);
-        viewModel.clearSaveMessagesList();
+        viewModel.clearSelectedMessagesList();
         mAdapter.unCheckAllMessages();
     }
 
@@ -183,23 +205,38 @@ public class ExactRoomFragment extends Fragment {
             @Override
             public void onShortClickEvent(Message message) {
                 viewModel.addMessageToSaveList(message);
-                selectedMessagesCounter.setText(String.valueOf(viewModel.getSaveMessagesList().size()));
+                selectedMessagesCounter.setText(String.valueOf(viewModel.getSelectedMessagesList().size()));
+                if (!message.getUserId().equals(FirebaseAuth.getInstance().getUid()))
+                    actionsToolbar.getMenu().findItem(R.id.delete_message_button).setVisible(false);
             }
 
             @Override
             public void onSecondShortClickEvent(Message message) {
                 viewModel.removeMessageFromSaveList(message);
-                int listSize = viewModel.getSaveMessagesList().size();
-                selectedMessagesCounter.setText(String.valueOf(listSize));
+                boolean noStrangerMessages = true;
+                for (Message item : viewModel.getSelectedMessagesList()) {
+                    if (!item.getUserId().equals(FirebaseAuth.getInstance().getUid())) {
+                        noStrangerMessages = false;
+                        break;
+                    }
+                }
+                if (noStrangerMessages)
+                    actionsToolbar.getMenu().findItem(R.id.delete_message_button).setVisible(true);
+
+                int listSize = viewModel.getSelectedMessagesList().size();
                 if (listSize < 1) {
                     hideActionsToolbar();
+                } else {
+                    selectedMessagesCounter.setText(String.valueOf(listSize));
                 }
             }
 
             @Override
             public void onLongClickEvent(Message message) {
                 viewModel.addMessageToSaveList(message);
-                selectedMessagesCounter.setText(String.valueOf(viewModel.getSaveMessagesList().size()));
+                selectedMessagesCounter.setText(String.valueOf(viewModel.getSelectedMessagesList().size()));
+                if (!message.getUserId().equals(FirebaseAuth.getInstance().getUid()))
+                    actionsToolbar.getMenu().findItem(R.id.delete_message_button).setVisible(false);
 
                 if (actionsToolbar.getVisibility() != View.VISIBLE)
                     actionsToolbar.startAnimation(fadeIn);
@@ -214,7 +251,7 @@ public class ExactRoomFragment extends Fragment {
                 ((MyApplication) getActivity().getApplication()).getApplicationComponent()
                         .getDatabase().messagesDao());
         viewModel = new ViewModelProvider(this, factory).get(ExactRoomViewModel.class);
-        viewModel.getmMessagesList().observe(getViewLifecycleOwner(), list -> {
+        viewModel.getMessagesList().observe(getViewLifecycleOwner(), list -> {
             mAdapter.submitAll(list);
             messagesListRecycler.scrollToPosition(mAdapter.getItemCount() - 1);
         });
@@ -268,13 +305,13 @@ public class ExactRoomFragment extends Fragment {
                     @Override
                     public void onNext(@NonNull RecyclerViewScrollEvent recyclerViewScrollEvent) {
                         floatingHeader.setText(DateUtil.getDayMonthString(
-                                viewModel.getmMessagesList().getValue().get(layoutManager
+                                viewModel.getMessagesList().getValue().get(layoutManager
                                         .findFirstVisibleItemPosition()).getSendingTime()));
 
                         handler.removeCallbacks(runnable);
                         if (animationAllowed[0]
                                 && layoutManager.findLastVisibleItemPosition()
-                                < viewModel.getmMessagesList().getValue().size() - 1) {
+                                < viewModel.getMessagesList().getValue().size() - 1) {
                             animationAllowed[0] = false;
                             floatingHeader.startAnimation(fadeIn);
                         }

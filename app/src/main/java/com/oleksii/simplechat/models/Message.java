@@ -65,8 +65,9 @@ public class Message {
     }
 
     @Ignore
-    public Message(boolean isSender, String userId, String firstname, String lastname, String body,
+    public Message(int id, boolean isSender, String userId, String firstname, String lastname, String body,
                    Timestamp stime, int viewType) {
+        this.id = id;
         this.isSender = isSender;
         this.userId = userId;
         this.firstname = firstname;

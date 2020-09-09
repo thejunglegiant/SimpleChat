@@ -12,6 +12,7 @@ import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.Socket;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.oleksii.simplechat.constants.NetworkConstants;
 import com.oleksii.simplechat.data.SavedMessagesDao;
 import com.oleksii.simplechat.di.AppComponent;
@@ -23,6 +24,7 @@ import com.oleksii.simplechat.data.net.ChatAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Type;
 import java.sql.Timestamp;
 import java.util.LinkedList;
 import java.util.List;
@@ -41,7 +43,7 @@ public class ExactRoomViewModel extends ViewModel {
 
     private static final String TAG = ExactRoomViewModel.class.getName();
     private MutableLiveData<List<Message>> mMessagesList = new MutableLiveData<>();
-    private List<Message> mSaveMessagesList = new LinkedList<>();
+    private List<Message> mSelectedMessagesList = new LinkedList<>();
     private MutableLiveData<Integer> membersCount = new MutableLiveData<>();
     private MutableLiveData<String> typingUser = new MutableLiveData<>();
     private long roomId;
@@ -76,6 +78,7 @@ public class ExactRoomViewModel extends ViewModel {
     private void init() {
         mMessagesList.setValue(new LinkedList<>());
 
+        mSocket.on(NetworkConstants.SOME_DELETED_MESSAGES_EVENT_ID, onSomeMessagesDeleted);
         mSocket.on(NetworkConstants.NEW_MESSAGE_RECEIVED_EVENT_ID, onNewMessageReceived);
         mSocket.on(NetworkConstants.SOMEONE_LEFT_GROUP_EVENT_ID, onSomeoneLeftGroup);
         mSocket.on(NetworkConstants.TYPING_EVENT_ID, onSomeonesTyping);
@@ -98,11 +101,26 @@ public class ExactRoomViewModel extends ViewModel {
 
     }
 
+    private Emitter.Listener onSomeMessagesDeleted = args -> {
+        JSONObject data = (JSONObject) args[0];
+        try {
+            if (data.getInt("roomId") == roomId) {
+                Type type = new TypeToken<LinkedList<Integer>>(){}.getType();
+                LinkedList<Integer> deleteMessages = gson.fromJson(data.getJSONArray("ids").toString(), type);
+                for (int id : deleteMessages) {
+                    this.removeMessageById(id);
+                }
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    };
+
     private Emitter.Listener onNewMessageReceived = args -> {
         JSONObject data = (JSONObject) args[0];
         try {
             if (data.getInt("roomId") == roomId) {
-                Message message = new Message(data.getString("userId")
+                Message message = new Message(data.getInt("id"), data.getString("userId")
                         .equals(FirebaseAuth.getInstance().getUid()),
                         data.getString("userId"), data.getString("firstname"),
                         data.getString("lastname"), data.getString("body"),
@@ -144,7 +162,20 @@ public class ExactRoomViewModel extends ViewModel {
         mMessagesList.postValue(tmp);
     }
 
-    public LiveData<List<Message>> getmMessagesList() {
+    private void removeMessageById(int id) {
+        List<Message> tmp = mMessagesList.getValue();
+
+        for (Message item : tmp) {
+            if (item.getId() == id) {
+                tmp.remove(item);
+                break;
+            }
+        }
+
+        mMessagesList.postValue(tmp);
+    }
+
+    public LiveData<List<Message>> getMessagesList() {
         return this.mMessagesList;
     }
 
@@ -181,24 +212,24 @@ public class ExactRoomViewModel extends ViewModel {
     }
 
     public void addMessageToSaveList(Message message) {
-        mSaveMessagesList.add(message);
+        mSelectedMessagesList.add(message);
     }
 
     public void removeMessageFromSaveList(Message message) {
-        mSaveMessagesList.remove(message);
+        mSelectedMessagesList.remove(message);
     }
 
-    public void clearSaveMessagesList() {
-        mSaveMessagesList.clear();
+    public void clearSelectedMessagesList() {
+        mSelectedMessagesList.clear();
     }
 
-    public List<Message> getSaveMessagesList() {
-        return mSaveMessagesList;
+    public List<Message> getSelectedMessagesList() {
+        return mSelectedMessagesList;
     }
 
     public void saveMessages() {
-        if (mSaveMessagesList.size() > 0) {
-            Observable.fromIterable(mSaveMessagesList).subscribe(new Observer<Message>() {
+        if (mSelectedMessagesList.size() > 0) {
+            Observable.fromIterable(mSelectedMessagesList).subscribe(new Observer<Message>() {
                 @Override
                 public void onSubscribe(Disposable d) {
                 }
@@ -235,5 +266,10 @@ public class ExactRoomViewModel extends ViewModel {
                 }
             });
         }
+    }
+
+    public void deleteMessages() {
+        mSocket.emit(NetworkConstants.DELETE_MESSAGES_EVENT_ID, "{\"roomId\":" + roomId
+                + ",\"array\":" + gson.toJson(mSelectedMessagesList) + "}");
     }
 }

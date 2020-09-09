@@ -9,6 +9,8 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
+import androidx.core.content.res.ResourcesCompat;
+
 import com.oleksii.simplechat.R;
 
 public class EasyCopyEditText extends androidx.appcompat.widget.AppCompatEditText {
@@ -34,10 +36,12 @@ public class EasyCopyEditText extends androidx.appcompat.widget.AppCompatEditTex
     }
 
     private void init() {
-        mCopyButtonImage = getResources().getDrawable(R.drawable.ic_copy_button, null);
+        mCopyButtonImage = ResourcesCompat.getDrawable(getResources(),
+                R.drawable.ic_copy_button, null);
         showButton();
         setInputType(InputType.TYPE_NULL);
-        setBackground(getResources().getDrawable(R.drawable.easycopy_edittext_background, null));
+        setBackground(ResourcesCompat.getDrawable(getResources(),
+                R.drawable.easycopy_edittext_background, null));
         setTextColor(getResources().getColor(R.color.colorGray, null));
         setCompoundDrawablePadding(48);
 
@@ -66,7 +70,8 @@ public class EasyCopyEditText extends androidx.appcompat.widget.AppCompatEditTex
 
                 if (isButtonClicked) {
                     if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                        mCopyButtonImage = getResources().getDrawable(R.drawable.ic_copy_button_dark, null);
+                        mCopyButtonImage = ResourcesCompat.getDrawable(getResources(),
+                                R.drawable.ic_copy_button_dark, null);
                         showButton();
                         if (getText() != null) {
                             selectAll();
@@ -77,7 +82,8 @@ public class EasyCopyEditText extends androidx.appcompat.widget.AppCompatEditTex
                         }
                     }
                     if (event.getAction() == MotionEvent.ACTION_UP) {
-                        mCopyButtonImage = getResources().getDrawable(R.drawable.ic_copy_button, null);
+                        mCopyButtonImage = ResourcesCompat.getDrawable(getResources(),
+                                R.drawable.ic_copy_button, null);
                         showButton();
                         return true;
                     }

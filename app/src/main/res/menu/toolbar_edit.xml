@@ -3,12 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/edit_button"
-        android:title="@string/edit_text"
-        android:icon="@drawable/ic_pencil"
-        app:showAsAction="always" />
-
-    <item
         android:id="@+id/copy_text_button"
         android:title="@string/copy_text"
         android:icon="@drawable/ic_copy_button_white"
